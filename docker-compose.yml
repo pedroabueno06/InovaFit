@@ -44,10 +44,6 @@ services:
     entrypoint: ["bash", "/tests/run_tests.sh"]
     profiles: ["test"]
   
-  volumes:
-    pgdata:
-    oradata:
-
   app-java:
     image: maven:3.9-eclipse-temurin-21
     working_dir: /workspace
@@ -61,3 +57,7 @@ services:
       postgres: {condition: service_healthy}
       oracle: {condition: service_healthy}
     profiles: ["apps"]
+
+volumes:
+  pgdata:
+  oradata:
