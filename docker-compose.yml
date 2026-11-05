@@ -1,0 +1,63 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: inovafit-postgres
+    environment:
+      POSTGRES_DB: inovafit
+      POSTGRES_USER: inovafit
+      POSTGRES_PASSWORD: inovafit_lab
+    ports: ["5432:5432"]
+    volumes:
+     - pgdata:/var/lib/postgressql/data
+     - ./docker/postgres-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U inovafit -d inovafit"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  oracle:
+    image: gvenzl/oracle-xe:21-slim
+    container_name: inovafit-oracle
+    environment:
+      ORACLE_PASSWORD: oracle_lab_password
+      APP_USER: inovafit
+      APP_USER_PASSWORD: inovafit_lab
+    ports: ["1521:1521"]
+    volumes:
+      - oradata:/opt/oracle/oradata
+      - ./docker/oracle-init:/container-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "healthcheck.sh"]
+      interval: 20s
+      timeout: 10s
+      retries: 30
+
+  testes:
+    image: postgres:17
+    depends_on:
+      postgres: {condition: service_healthy}
+      oracle: {condition: service_healthy}
+    environment:
+      PGPASSWORD: inovafit_lab
+    volumes: ["./tests:/tests:ro"]
+    entrypoint: ["bash", "/tests/run_tests.sh"]
+    profiles: ["test"]
+  
+  volumes:
+    pgdata:
+    oradata:
+
+  app-java:
+    image: maven:3.9-eclipse-temurin-21
+    working_dir: /workspace
+    volumes: ["./java:/workspace"]
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/inovafit
+      DB_USER: inovafit
+      DB_PASSWORD: inovafit_lab
+    command: ["mvn", "-q", "compile", "exec:java"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      oracle: {condition: service_healthy}
+    profiles: ["apps"]
