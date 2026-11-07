@@ -1,4 +1,6 @@
 -- 1 JOIN: Verificação de alunos e planos que estão ativos
+-- Siginifica que será realizada uma junção entre as tabelas de alunos,
+-- matrículas e planos, para verificar quais alunos possuem planos ativos.
 SELECT a.nome,p.nome plano,m.status
     FROM aluno a
     JOIN matricula m
@@ -8,6 +10,8 @@ SELECT a.nome,p.nome plano,m.status
     WHERE m.status='ATIVA';
 
 -- 2 JOIN: Listagem de modalidade por aluno
+-- Siginifica que será realizada uma junção entre as tabelas de alunos,
+-- matrículas e planos, para verificar quais alunos possuem planos ativos.
 SELECT a.nome,mo.nome modalidade
     FROM aluno a
     JOIN matricula m
@@ -67,7 +71,6 @@ SELECT a.id_aluno,a.nome
 -- Significa que será realizado uma consulta dentro de outra consulta,
 -- ou seja, será realizada uma consulta para calcular a média de pagamentos,
 -- após isso, será feita outra consulta para buscar os pagamentos que estão acima dessa média.
-
 SELECT id_pagamento,id_matricula,valor
     FROM pagamento
     WHERE valor>(SELECT AVG(valor) FROM pagamento);
