@@ -11,33 +11,53 @@ public class Inovafit {
         String url = env("DB_URL", "jdbc:postgresql://localhost:5432/inovafit");
         String user = env("DB_USER", "inovafit");
         String password = env("DB_PASSWORD", "inovafit_lab");
+        
+        try (Connection connection = DriverManager.getConnection(url, user, password);
+            Scanner scanner = new Scanner(System.in)) {
+                connection.setAutoCommit(false);
 
-        try (Connection connection = DriverManager.getConnection(url, user, password); Scanner scanner = new Scanner(System.in)) {
-            connection.setAutoCommit(false);
-            System.out.println("=== InovaFit ===");
-            System.out.println("Escolha uma opção:");
-            System.out.println("1- Consultar alunos e sua situação financeira");
-            System.out.println("2- Confirmar pagamento pelo ID");
-            System.out.print("Opção: ");
-            int opcao = Integer.parseInt(scanner.nextLine());
-            if (opcao == 1) {
-                consultar(connection);
+            while (true) {
+                System.out.println("=== InovaFit ===");
+                System.out.println("Escolha uma opção:");
+                System.out.println("1- Consultar alunos e sua situação financeira");
+                System.out.println("2- Confirmar pagamento pelo ID");
+                System.out.print("Digite a sua escolha: ");
+                int opcao;
+                
+                try {
+                    opcao = Integer.parseInt(scanner.nextLine());
 
-            } else if (opcao == 2) {
-                System.out.print("ID do pagamento: ");
-                long id = Long.parseLong(scanner.nextLine());
-                confirmarPagamento(connection, id);
+                } catch (NumberFormatException e) {
+                    System.out.println("Digite um número válido");
+                    continue;
+                }
 
-            } else {
-                System.out.println("Opção inválida.");
-                connection.commit();
+                try {
+                    if (opcao == 1) {
+                    consultar(connection);
+                        connection.commit();
+
+                } else if (opcao == 2) {
+                    System.out.print("ID do pagamento: ");
+                    long id = Long.parseLong(scanner.nextLine());
+                    confirmarPagamento(connection, id);
+                        connection.commit();
+
+                } else {
+                    System.out.println("Opção inválida. Digite uma opção válida");
+                    connection.commit();
+                    
+                }
+            } catch (SQLException e) {
+                System.err.println("Erro de banco de dados: " + e.getMessage());
+                System.err.println("Código SQL: " + e.getSQLState());
+
+            } catch (NumberFormatException e) {
+                System.err.println("Informe um número válido.");
+            }
             }
         } catch (SQLException e) {
-            System.err.println("Erro de banco de dados: " + e.getMessage());
-            System.err.println("Código SQL: " + e.getSQLState());
-
-        } catch (NumberFormatException e) {
-            System.err.println("Informe um número válido.");
+            System.err.println("Erro de conexão: " + e.getMessage());
         }
     }
 

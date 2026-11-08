@@ -1,5 +1,5 @@
 -- 1 JOIN: Verificação de alunos e planos que estão ativos
--- Siginifica que será realizada uma junção entre as tabelas de alunos,
+-- Significa que será realizada uma junção entre as tabelas de alunos,
 -- matrículas e planos, para verificar quais alunos possuem planos ativos.
 SELECT a.nome,p.nome plano,m.status
     FROM aluno a
@@ -10,7 +10,7 @@ SELECT a.nome,p.nome plano,m.status
     WHERE m.status='ATIVA';
 
 -- 2 JOIN: Listagem de modalidade por aluno
--- Siginifica que será realizada uma junção entre as tabelas de alunos,
+-- Significa que será realizada uma junção entre as tabelas de alunos,
 -- matrículas e planos, para verificar quais alunos possuem planos ativos.
 SELECT a.nome,mo.nome modalidade
     FROM aluno a
@@ -50,7 +50,7 @@ SELECT a.nome, COUNT(f.id_frequencia) presencas,
     ON f.id_matricula=m.id_matricula
     GROUP BY a.nome;
 
--- 6 WINDOW: Acumulo de pagamentos por matrícula
+-- 6 WINDOW: Acúmulo de pagamentos por matrícula
 -- Significa que será realizado um cálculo de linhas de dados em relação a outras linhas de dados
 SELECT id_matricula,competencia,valor,
     SUM(valor) OVER(PARTITION BY id_matricula ORDER BY competencia) acumulado
