@@ -95,21 +95,7 @@ O diagrama das oito tabelas existentes está em `der/DER.md` (formato Mermaid). 
 ## Estrutura
 
 ```text
-InovaFit-master/
-├── docker-compose.yml
-├── docker/
-│   ├── postgres-init/postgres-init.sh
-│   └── oracle-init/oracle-init.sh
-├── java/InovaFit/src/main/java/com/example/Inovafit.java
-├── python/            # Cliente Python e dependências
-├── der/DER.md         # Diagrama ER do esquema implementado
-├── postgresql/       # DDL, inserts, consultas e índices
-├── oracle/           # DDL, inserts, consultas e índices
-├── procedures/       # Procedures e triggers dos dois bancos
-├── performance/      # Java, carga de dados e instruções de medição
-├── tests/run_tests.sh
-├── pom.xml
-└── README.md
+
 ```
 
 ## Como executar
