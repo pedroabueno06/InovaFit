@@ -12,6 +12,7 @@
     <properties>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <exec.mainClass>com.example.Inovafit</exec.mainClass>
     </properties>
 
     <dependencies>
@@ -31,17 +32,38 @@
     </dependencies>
 
     <build>
-        <sourceDirectory>${project.basedir}/java/InovaFit/src/main/java</sourceDirectory>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.5.0</version>
+    <sourceDirectory>${project.basedir}/java/InovaFit/src/main/java</sourceDirectory>
+    <plugins>
+        <!-- Reconhece a pasta performance -->
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <version>3.6.1</version>
+            <executions>
+                <execution>
+                    <id>adicionar-performance</id>
+                    <phase>generate-sources</phase>
+                    <goals>
+                        <goal>add-source</goal>
+                    </goals>
+                    <configuration>
+                        <sources>
+                            <source>${project.basedir}/performance</source>
+                        </sources>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.5.0</version>
             <configuration>
-                 <mainClass>com.example.Inovafit</mainClass>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+                <mainClass>${exec.mainClass}</mainClass>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
 
 </project>

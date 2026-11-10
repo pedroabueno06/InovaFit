@@ -1,2 +1,6 @@
 com\example\Inovafit.class
+performance\Oracle.class
+performance\PostgreSQL.class
+performance\Motor.class
 com\example\SQLExeception.class
+performance\MedirPerformance.class

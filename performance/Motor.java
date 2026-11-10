@@ -16,10 +16,14 @@ public abstract class Motor implements AutoCloseable {
         String[] nomes = nomesConsultas();
         String[] sqls = consultas();
 
+        if (nomes.length != sqls.length) {
+            throw new IllegalArgumentException("A quantidade de consultas e nomes é diferente.");
+        }
+
         for(int i = 0; i < sqls.length; i++) {
-            System.out.println("\n====================");
+            System.out.println("\n==============================");
             System.out.println(nomes[i]);
-            System.out.println("====================");
+            System.out.println("===============================");
             System.out.println("\nPlano de execução:");
             exibirPlano(sqls[i]);
 
@@ -65,6 +69,7 @@ public abstract class Motor implements AutoCloseable {
         try (PreparedStatement statement = conexao.prepareStatement(sql);
             ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
+                resultSet.getObject(1);
             }
         }
     }

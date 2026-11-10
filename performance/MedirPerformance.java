@@ -1,6 +1,6 @@
-public class MedirPerformace {
+public class MedirPerformance {
     public static void main(String[] args) {
-        System.out.println("====================");
+        System.out.println("=====================");
         System.out.println("PERFORMACE - INOVAFIT");
         System.out.println("=====================");
 
@@ -10,7 +10,7 @@ public class MedirPerformace {
             postgreSQL.executarTestes();
 
         } catch (Exception e) {
-            System.out.println("Erro no banco de dados PostgreSQL: " + e.getMessage());
+            e.printStackTrace();
         }
 
         //Testes no banco de dados Oracle
@@ -19,7 +19,7 @@ public class MedirPerformace {
             oracle.executarTestes();
 
         } catch (Exception e) {
-            System.out.println("Erro no banco de dados Oracle: " + e.getMessage());
+            e.printStackTrace();
         }
 
         System.out.println("\nTestes finalizados!");

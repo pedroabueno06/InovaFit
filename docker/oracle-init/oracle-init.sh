@@ -1,11 +1,11 @@
-set - euo pipefail
+set -euo pipefail
 
 export NLS_LANG=.AL32UTF8
 
-CONNECTION="%APP_USER/$APP_USER_PASSWORD@//localhost/XEPDB1"
+CONNECTION="${APP_USER}/${APP_USER_PASSWORD}@//localhost:1521/XEPDB1"
 
 rodar() {
-    sqlplus -s "$CONNECTION" <<SQL
+sqlplus -s -L "$CONNECTION" <<SQL
 WHENEVER SQLERROR EXIT SQL.SQLCODE
 WHENEVER OSERROR EXIT FAILURE
 SET DEFINE OFF
@@ -14,12 +14,13 @@ EXIT
 SQL
 }
 
-rodar /scripts/oracle/01_ddl.sql
-rodar /scripts/oracle/02_inserts.sql
-rodar /scripts/procedures/oracle_procedures.sql
-rodar /scripts/oracle/04_indices.sql
+rodar /scripts/oracle/Ddl.sql
+rodar /scripts/oracle/Inserts.sql
+rodar /scripts/procedures/Oracle_procedures.sql
+rodar /scripts/oracle/Indices.sql
 
 erros=$(sqlplus -s -L "$CONNECTION" <<SQL
+WHENEVER SQLERROR EXIT SQL.SQLCODE
 SET HEADING OFF FEEDBACK OFF PAGESIZE 0
 SELECT COUNT(*) FROM user_errors;
 EXIT
@@ -27,8 +28,8 @@ SQL
 )
 
 if [ "$(echo "$erros" | tr -d '[:space:]')" != "0" ]; then
-    echo "ERRO: objetos PL/SQL com erro de compilação" >&2
-    exit 1
+echo "ERRO: objetos PL/SQL com erro de compilação" >&2
+exit 1
 fi
 
-echo "FitControl: Oracle inicializado com sucesso."
+echo "InovaFit: Banco de dados Oracle inicializado com sucesso."

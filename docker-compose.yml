@@ -51,15 +51,21 @@ services:
   app-java:
     image: maven:3.9-eclipse-temurin-21
     working_dir: /workspace
-    volumes: ["./java:/workspace"]
+    volumes:
+      - ./:/workspace
     environment:
-      DB_URL: jdbc:postgresql://postgres:5432/inovafit
-      DB_USER: inovafit
-      DB_PASSWORD: inovafit_lab
+      PG_URL: jdbc:postgresql://postgres:5432/inovafit
+      PG_USER: inovafit
+      PG_PASSWORD: inovafit_lab
+      ORA_URL: jdbc:oracle:thin:@//oracle:1521/XEPDB1
+      ORA_USER: inovafit
+      ORA_PASSWORD_APP: inovafit_lab
     command: ["mvn", "-q", "compile", "exec:java"]
     depends_on:
-      postgres: {condition: service_healthy}
-      oracle: {condition: service_healthy}
+      postgres:
+        condition: service_healthy
+      oracle:
+        condition: service_healthy
     profiles: ["apps"]
 
 volumes:

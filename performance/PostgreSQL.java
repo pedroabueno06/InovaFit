@@ -21,19 +21,25 @@ public class PostgreSQL extends Motor {
         };
     }
 
+    @Override 
     protected String[] consultas() {
         return new String[] {
             """
             SELECT *
                 FROM pagamento
-            WHERE id_matricula = 3
+            WHERE id_matricula = (
+                SELECT m.id_matricula
+                FROM matricula m
+                JOIN aluno a ON a.id_aluno = m.id_aluno
+                WHERE a.email = 'ascencobuenomiguel@gmail.com'
+            )
             """,
 
             """
-            SELECT *
-                FROM pagamento
+           SELECT *
+            FROM pagamento
             WHERE vencimento < CURRENT_DATE - 10
-                AND status <> 'PAGO'
+            AND status = 'ATRASADO'
             """
         };
     }

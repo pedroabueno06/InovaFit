@@ -5,38 +5,48 @@
 -- 1 Após o aluno realizar o pagamento, o mesmo é atualizado
 -- e a matrícula é ativada, caso esteja bloqueada ou é o primeiro
 -- pagamento feito pelo aluno, assim podendo entrar na academia.
-CREATE OR REPLACE PROCEDURE registrar_pagamento(p_id_pagamento IN NUMBER)
-    AS v_id_matricula NUMBER;
-    v_data_inicio DATE;
-    V_VALOR_PLANO NUMBER(10,2);
-    v_status VARCHAR(20);
+CREATE OR REPLACE PROCEDURE registrar_pagamento(
+    p_id_pagamento IN NUMBER
+)
+AS
+    v_status_pagamento VARCHAR2(20);
+
 BEGIN
-    SELECT pg.id_matricula,m.data_inicio,pl.valor_mensal,m.status
-        INTO v_id_matricula,v_data_inicio,v_valor_plano,v_status
-        FROM pagamento pg
-        JOIN matricula m
-        ON m.id_matricula=pg.id_matricula
-        JOIN plano pl
-        ON pl.id_plano=m.id_planno
-    WHERE pg.id_pagamento=p_id_pagamento
-        FOR UPDATE OF pg.status;
-        UPDATE pagamento
-            SET status='PAGO', data_pagamento=TRUNC(SYSDATE),
-                valor=CASE WHEN v_status='ATIVA'
-            AND ADD_MONTHS(v_data_inicio,12)<=TRUNC(SYSDATE)
-            THEN v_valor_plano*0.90
-            ELSE valor
-        END
-    WHERE id_pagamento=p_id_pagamento
-        AND status<>'PAGO';
-    IF SQL%ROWCOUNT=0 THEN
-        RAISE_APPLICATION_ERROR(-2002,'PAGAMENTO_JA_CONFIRMADO');
+    -- Busca o pagamento e bloqueia o registro durante a operação
+    SELECT status
+    INTO v_status_pagamento
+    FROM pagamento
+    WHERE id_pagamento = p_id_pagamento
+    FOR UPDATE;
+
+    -- Realiza a verificação sobre se o pagamento já foi feito
+    IF v_status_pagamento = 'PAGO' THEN
+        RAISE_APPLICATION_ERROR(
+            -20002,
+            'PAGAMENTO_JA_CONFIRMADO'
+        );
+
+    -- Realiza a verificação sobre se o pagamento está pendente
+    ELSIF v_status_pagamento = 'PENDENTE' THEN
+        RAISE_APPLICATION_ERROR(
+            -20004,
+            'PAGAMENTO_PENDENTE'
+        );
+
+    -- Realiza a verificação sobre o pagamento está atrasado
+    ELSIF v_status_pagamento = 'ATRASADO' THEN
+        RAISE_APPLICATION_ERROR(
+            -20005,
+            'PAGAMENTO_ATRASADO'
+        );
     END IF;
-    UPDATE matricula
-        SET bloqueada=0
-    WHERE id_matricula=v_id_matricula;
-        EXCEPTION WHEN NO_DATA_FOUND THEN
-        RAISE_APPLICATION_ERROR(-20001,'PAGAMENTO_NAO_ENCONTRADO');
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RAISE_APPLICATION_ERROR(
+            -20001,
+            'PAGAMENTO_NAO_ENCONTRADO'
+        );
 END;
 /
 
@@ -45,7 +55,7 @@ CREATE OR REPLACE PROCEDURE cancelar_matricula(p_id_matricula IN NUMBER)
     AS
 BEGIN
     UPDATE matricula
-        SET status='CANCELADA', data_fim=TRUNC(SYSDATE), bloqueda=1
+        SET status='CANCELADA', data_fim=TRUNC(SYSDATE), bloqueada=1
     WHERE id_matricula=p_id_matricula
         AND status='ATIVA';
     IF SQL%ROWCOUNT=0 THEN
@@ -70,11 +80,11 @@ BEGIN
         FROM matricula
     WHERE id_matricula=:NEW.id_matricula
         AND status='ATIVA'
-        AND bloqueda=0;
+        AND bloqueada=0;
     IF v_qtd=0 THEN
         RAISE_APPLICATION_ERROR(-20011,'MATRICULA_INATIVA_OU_BLOQUEADA');
     END IF;
-    SELECT COUNT(*) INT v_qtd
+    SELECT COUNT(*) INTO v_qtd
         FROM pagamento
     WHERE id_matricula=:NEW.id_matricula
         AND status<>'PAGO'

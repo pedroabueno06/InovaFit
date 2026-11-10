@@ -35,7 +35,7 @@ INSERT INTO matricula_modalidade(id_matricula,id_modalidade)
           (3, 1),
           (3, 3);
 
-INSER INTO pagamento(id_matricula,competencia,vencimento,data_pagamento,valor,status)
+INSERT INTO pagamento(id_matricula,competencia,vencimento,data_pagamento,valor,status)
     VALUES(1, date_trunc('month', CURRENT_DATE)::date, CURRENT_DATE-1, CURRENT_DATE-2, 85.50, 'PAGO'),
           (2, date_trunc('month', CURRENT_DATE)::date, CURRENT_DATE+5, NULL, 120, 'PENDENTE'),
           (3, date_trunc('month', CURRENT_DATE)::date, CURRENT_DATE-12, NULL, 110, 'ATRASADO');

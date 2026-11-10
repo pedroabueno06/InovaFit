@@ -45,7 +45,7 @@ INSERT INTO matricula(id_aluno,id_plano,data_inicio,status,bloqueada)
     VALUES(3, 2, ADD_MONTHS(TRUNC(SYSDATE), -16), 'ATIVA', 0);
 
 INSERT INTO matricula(id_aluno,id_plano,data_inicio,status,bloqueada)
-    VALUES(4, 1, ADD_MONTHS(TRUNC(SYSDATE), -2), 'ATIVA', 0);
+    VALUES(4, 1, ADD_MONTHS(TRUNC(SYSDATE), -2), 'CANCELADA', 0);
 
 INSERT INTO matricula_modalidade(id_matricula,id_modalidade)
     VALUES(1,1);

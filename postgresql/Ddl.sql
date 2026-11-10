@@ -48,7 +48,7 @@ CREATE TABLE matricula_modalidade (
     data_inclusao DATE NOT NULL DEFAULT CURRENT_DATE,
     CONSTRAINT fk_mm_matricula FOREIGN KEY (id_matricula) REFERENCES matricula(id_matricula) ON DELETE CASCADE,
     CONSTRAINT fk_mm_modalidade FOREIGN KEY (id_modalidade) REFERENCES modalidade(id_modalidade) ON DELETE RESTRICT,
-    CONSTRAINT uk_matricula_modalidade UNIQUE (id_matricula,id_modalidade),
+    CONSTRAINT uk_matricula_modalidade UNIQUE (id_matricula,id_modalidade)
 );
 
 CREATE TABLE pagamento (
