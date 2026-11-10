@@ -2,8 +2,6 @@
 
 Sistema acadêmico de gerenciamento de academia, desenvolvido para a disciplina de Banco de Dados. O projeto demonstra modelagem relacional, constraints, consultas SQL, procedures, triggers, índices e acesso JDBC em dois SGBDs: PostgreSQL 17 e Oracle Database XE 21c.
 
-> **Validação:** os arquivos foram revisados e corrigidos estaticamente. Neste ambiente não há Docker, Maven, PostgreSQL ou Oracle disponíveis; portanto, não afirmamos que os bancos foram inicializados ou que os testes de integração foram executados. Siga os passos abaixo para validar no ambiente local.
-
 ## Objetivos
 
 - Gerenciar alunos, planos, modalidades e matrículas.
