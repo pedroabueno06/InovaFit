@@ -1,7 +1,11 @@
 com/example/InovafitTest.class
 com/example/BancoTest$Verificacao.class
+com/example/TriggerTest.class
 com/example/DdlTest.class
 com/example/InovafitTest$Banco.class
+com/example/ConsultasTest.class
+com/example/IndicesTest.class
+com/example/DadosTest.class
+com/example/ProceduresTest.class
 com/example/BancoTest.class
-com/example/InovafitTest$Verificacao.class
 com/example/BancoTest$Banco.class

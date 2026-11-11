@@ -7,7 +7,7 @@ SELECT a.nome,p.nome plano,m.status
     ON m.id_aluno=a.id_aluno
     JOIN plano p
     ON p.id_plano=m.id_plano
-    WHERE m.status='ATIVA';
+WHERE m.status='ATIVA';
 
 -- 2 JOIN: Listagem de modalidade por aluno
 -- Significa que será realizada uma junção entre as tabelas de alunos,
@@ -85,7 +85,7 @@ SELECT DISTINCT a.nome,p.vencimento,p.valor
     WHERE p.status<>'PAGO'
     AND p.vencimento<CURRENT_DATE-10;
 
--- 10 Receita recebida por competência
+-- 10 Receita de pagamento recebida por competência
 -- Serão feitas as somas dos valores que foram feitos por competência
 SELECT competencia,SUM(valor) receita
     FROM pagamento

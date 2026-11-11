@@ -33,7 +33,7 @@ public class BancoTest {
         void executar(Banco banco, Connection connection) throws Exception;
     }
 
-    static void testarEmAmbosOsBancosDeDados(Verificacao verificacao) throws Exception {
+    public static void testarEmAmbosOsBancosDeDados(Verificacao verificacao) throws Exception {
         for (Banco banco : bancos()) {
             try (Connection connection = connection(banco)) {
                 try {
