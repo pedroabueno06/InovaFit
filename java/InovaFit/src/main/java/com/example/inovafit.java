@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Scanner;
 
 public class Inovafit {
@@ -27,11 +28,11 @@ public class Inovafit {
         try (Scanner scanner = new Scanner(System.in)){
 
             while (true) {
-                System.out.println("=== InovaFit ===");
+                System.out.println("\n=== InovaFit ===");
                 System.out.println("Escolha entre os dois bancos de dados:");
-                System.out.println("1- PostgreSQL");
-                System.out.println("2- Oracle");
-                System.out.print("0- Encerrar");
+                System.out.println("1- PostgreSQL;");
+                System.out.println("2- Oracle;");
+                System.out.print("0- Encerrar.");
                 System.out.println("\nDigite a sua escolha: ");
                 int opcao;
                 
@@ -44,7 +45,7 @@ public class Inovafit {
                 }
 
                 if (opcao == 0) {
-                    System.out.println("Sistema encerrado.");
+                    System.out.println("\nSistema encerrado.");
                     break;
                 }
 
@@ -81,11 +82,11 @@ public class Inovafit {
     private static void executarMenu(Connection connection, Scanner scanner) {
 
         while (true) { 
-            System.out.println("=== INOVAFIT ===");
-            System.out.println("Banco de dados conectado: " + connectionBanco(connection));
-            System.out.println("1- Consultar alunos e situação financeira");
-            System.out.println("2- Confirmar pagamento pelo ID");
-            System.out.println("0- Voltar à escolha do banco de dados");
+            System.out.println("\n=== INOVAFIT ===");
+            System.out.println("Banco de dados conectado: " + connectionBanco(connection) + ".");
+            System.out.println("1- Consultar alunos e situação financeira;");
+            System.out.println("2- Consultar status do pagamento pelo ID;");
+            System.out.println("0- Voltar à escolha do banco de dados.");
             System.out.println("Digite a sua escolha: ");
                 int opcao;
 
@@ -106,7 +107,7 @@ public class Inovafit {
                     connection.commit();
 
                 } else if (opcao == 2) {
-                    System.out.println("ID de pagamento: ");
+                    System.out.println("\nID de pagamento: ");
                         long id = Long.parseLong(scanner.nextLine());
                         confirmarPagamento(connection, id);
                         connection.commit();
@@ -144,12 +145,12 @@ public class Inovafit {
             preparedStatement.setString(1, "ATIVA");
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                System.out.println("==================== ALUNOS ====================");
+                System.out.println("\n==================== ALUNOS ====================");
                     boolean encontrou = false;
 
                 while (resultSet.next()) {
                     encontrou = true;
-                    System.out.println("--------------------");
+                    System.out.println("--------------------------");
                     System.out.println("Aluno: " + resultSet.getString("nome"));
                     System.out.println("Plano: " + resultSet.getString("plano"));
                     System.out.println("Status: " + resultSet.getString("status"));
@@ -165,25 +166,39 @@ public class Inovafit {
 
     private static void confirmarPagamento(Connection connection, long id) throws SQLException {
         String url = connection.getMetaData().getURL();
+        String status;
 
         if(url.startsWith("jdbc:postgresql:")) {
-            String sql = "CALL registrar_pagamento(?)";
+            String sql = "CALL registrar_pagamento(?, NULL)";
 
             //Aqui é onde a procedure é chamada a partir de um parâmetro;
             //Commit fica sob controle da aplicação.
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                 preparedStatement.setLong(1, id);
-                preparedStatement.execute();
+                boolean resultado = preparedStatement.execute();
+
+                if(resultado) {
+                    try (ResultSet resultSet = preparedStatement.getResultSet()) {
+                        if(resultSet.next()) {
+                            status = resultSet.getString(1);
+                            System.out.println("Status de pagamento: " + status);
+                        }
+                    }
+                }
             }
 
         } else if (url.startsWith("jdbc:oracle:")) {
-            String sql = "{call registrar_pagamento(?)}";
+            String sql = "{call registrar_pagamento(?, ?)}";
 
             //Aqui é onde a procedure é chamada a partir de um parâmetro;
             //Commit fica sob controle da aplicação.
             try (CallableStatement callableStatement = connection.prepareCall(sql)) {
                 callableStatement.setLong(1, id);
+                callableStatement.registerOutParameter(2, Types.VARCHAR);
                 callableStatement.execute();
+
+                status = callableStatement.getString(2);
+                System.out.println("Status de pagamento: " + status);
             }
         }
     }
@@ -198,7 +213,7 @@ public class Inovafit {
                     int codigo = e.getErrorCode();
 
                 if(mensagem.contains("PAGAMENTO_NAO_ENCONTRADO") || "P1001".equals(estado) || codigo == 20001) {
-                    System.err.println("Pagamento não encontrado");
+                    System.err.println("Pagamento não encontrado.");
 
                 } else if (mensagem.contains("PAGAMENTO_JA_CONFIRMADO") || "P1002".equals(estado) || codigo == 20002) {
                     System.err.println("Pagamento já confirmado.\n");

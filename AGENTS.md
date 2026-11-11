@@ -28,11 +28,14 @@ O objetivo é implementar regras de negócio diretamente nos bancos de dados, ut
 - `performance/`: classes Java e scripts SQL utilizados nos testes de desempenho.
 - `java/`: aplicação Java com JDBC.
 - `docker/`: scripts de inicialização dos bancos.
-- `tests/`: testes automatizados.
+- `tests/`: destinada aos testes do projeto, ainda em desenvolvimento.
+- `src/test/java/`: estrutura destinada aos testes Java.
 - `.agents/skills/`: skills utilizadas pelo OpenCode.
-- `der/`: arquivos relacionados ao diagrama entidade-relacionamento.
+- `der/`: destinada aos arquivos e tabelas do modelo desenvolvido no Architect.
 - `docker-compose.yml`: configuração dos serviços Docker.
 - `README.md`: documentação do projeto.
+- `AGENTS.md`: instruções e regras para o agente de IA.
+- `opencode.json`: configuração de permissões e segurança do OpenCode.
 
 ## 4. Regras de desenvolvimento
 

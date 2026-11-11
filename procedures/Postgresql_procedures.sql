@@ -2,47 +2,25 @@
 | ---PROCEDURES--- |
  ------------------
 
--- 1 Após o aluno realizar o pagamento, o mesmo é atualizado
--- e a matrícula é ativada, caso esteja bloqueada ou é o primeiro
--- pagamento feito pelo aluno, assim podendo entrar na academia.
-CREATE OR REPLACE PROCEDURE registrar_pagamento(p_id_pagamento BIGINT)
+-- 1 RetornaPAGO, PENDENTE OU ATRASADOpelo parâmetro OUT,
+-- Se o pagamento não existir, é gerado um erro de negócio.
+CREATE OR REPLACE PROCEDURE registrar_pagamento(
+    IN p_id_pagamento BIGINT,
+    OUT p_status_pagamento VARCHAR(20)
+)
 LANGUAGE plpgsql
 AS $$
-DECLARE
-    v_status_pagamento VARCHAR(20);
 BEGIN
-    -- Busca o pagamento e bloqueia o registro durante a operação
     SELECT status
-    INTO v_status_pagamento
+    INTO p_status_pagamento
     FROM pagamento
-    WHERE id_pagamento = p_id_pagamento
-    FOR UPDATE;
+    WHERE id_pagamento = p_id_pagamento;
 
-    -- Realiza a verificação para ver se o pagamento existe
     IF NOT FOUND THEN
         RAISE EXCEPTION USING
             ERRCODE = 'P1001',
             MESSAGE = 'PAGAMENTO_NAO_ENCONTRADO';
-
-    -- Realiza a verificação sobre se o pagamento já foi feito
-    ELSIF v_status_pagamento = 'PAGO' THEN
-        RAISE EXCEPTION USING
-            ERRCODE = 'P1002',
-            MESSAGE = 'PAGAMENTO_JA_CONFIRMADO';
-
-    -- Realiza a verificação sobre se o pagamento está pendente
-    ELSIF v_status_pagamento = 'PENDENTE' THEN
-        RAISE EXCEPTION USING
-            ERRCODE = 'P1004',
-            MESSAGE = 'PAGAMENTO_PENDENTE';
-
-    -- Realiza a verificação sobre o pagamento está atrasado
-    ELSIF v_status_pagamento = 'ATRASADO' THEN
-        RAISE EXCEPTION USING
-            ERRCODE = 'P1005',
-            MESSAGE = 'PAGAMENTO_ATRASADO';
     END IF;
-
 END;
 $$;
 

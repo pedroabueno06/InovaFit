@@ -29,41 +29,63 @@
             <artifactId>ojdbc11</artifactId>
             <version>23.9.0.25.07</version>
         </dependency>
+
+        <!-- Testes automatizados com JUnit 5 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.11.4</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+    
 
     <build>
-    <sourceDirectory>${project.basedir}/java/InovaFit/src/main/java</sourceDirectory>
-    <plugins>
-        <!-- Reconhece a pasta performance -->
-        <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <version>3.6.1</version>
-            <executions>
-                <execution>
-                    <id>adicionar-performance</id>
-                    <phase>generate-sources</phase>
-                    <goals>
-                        <goal>add-source</goal>
-                    </goals>
-                    <configuration>
-                        <sources>
-                            <source>${project.basedir}/performance</source>
-                        </sources>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
+        <sourceDirectory>${project.basedir}/java/InovaFit/src/main/java</sourceDirectory>
+        <plugins>
+            <!-- Reconhece a pasta performance -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.6.1</version>
+                <executions>
+                    <execution>
+                        <id>adicionar-performance</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.basedir}/performance</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-        <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>3.5.0</version>
-            <configuration>
-                <mainClass>${exec.mainClass}</mainClass>
-            </configuration>
-        </plugin>
-    </plugins>
-</build>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <configuration>
+                    <mainClass>${exec.mainClass}</mainClass>
+                </configuration>
+            </plugin>
+                <!-- Compilação Java -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.13.0</version>
+                </plugin>
+
+                <!-- Execução dos testes automatizados -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.5.2</version>
+                </plugin>
+        </plugins>
+    </build>
 
 </project>

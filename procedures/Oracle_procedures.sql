@@ -2,44 +2,18 @@
 | ---PROCEDURES--- |
  ------------------
 
--- 1 Após o aluno realizar o pagamento, o mesmo é atualizado
--- e a matrícula é ativada, caso esteja bloqueada ou é o primeiro
--- pagamento feito pelo aluno, assim podendo entrar na academia.
+-- 1 RetornaPAGO, PENDENTE OU ATRASADOpelo parâmetro OUT,
+-- Se o pagamento não existir, é gerado um erro de negócio.
 CREATE OR REPLACE PROCEDURE registrar_pagamento(
-    p_id_pagamento IN NUMBER
+    p_id_pagamento IN NUMBER,
+    p_status_pagamento OUT VARCHAR2
 )
 AS
-    v_status_pagamento VARCHAR2(20);
-
 BEGIN
-    -- Busca o pagamento e bloqueia o registro durante a operação
     SELECT status
-    INTO v_status_pagamento
+    INTO p_status_pagamento
     FROM pagamento
-    WHERE id_pagamento = p_id_pagamento
-    FOR UPDATE;
-
-    -- Realiza a verificação sobre se o pagamento já foi feito
-    IF v_status_pagamento = 'PAGO' THEN
-        RAISE_APPLICATION_ERROR(
-            -20002,
-            'PAGAMENTO_JA_CONFIRMADO'
-        );
-
-    -- Realiza a verificação sobre se o pagamento está pendente
-    ELSIF v_status_pagamento = 'PENDENTE' THEN
-        RAISE_APPLICATION_ERROR(
-            -20004,
-            'PAGAMENTO_PENDENTE'
-        );
-
-    -- Realiza a verificação sobre o pagamento está atrasado
-    ELSIF v_status_pagamento = 'ATRASADO' THEN
-        RAISE_APPLICATION_ERROR(
-            -20005,
-            'PAGAMENTO_ATRASADO'
-        );
-    END IF;
+    WHERE id_pagamento = p_id_pagamento;
 
 EXCEPTION
     WHEN NO_DATA_FOUND THEN
