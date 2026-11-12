@@ -1,8 +1,8 @@
 -- ------------------
--- PROCEDURES
+--| ---PROCEDURES--- |
 -- ------------------
  
--- 1 RetornaPAGO, PENDENTE OU ATRASADOpelo parâmetro OUT,
+-- 1 Retorna PAGO, PENDENTE OU ATRASADO pelo parâmetro OUT,
 -- Se o pagamento não existir, é gerado um erro de negócio.
 CREATE OR REPLACE PROCEDURE registrar_pagamento(
     p_id_pagamento IN NUMBER,
@@ -22,7 +22,7 @@ EXCEPTION
             'PAGAMENTO_NAO_ENCONTRADO'
         );
 END;
-/
+
  
 -- 2 Após ter a matrícula cancelada, a mesma tem seu estado alterado e vigência encerrada
 CREATE OR REPLACE PROCEDURE cancelar_matricula(p_id_matricula IN NUMBER) 
@@ -36,11 +36,11 @@ BEGIN
         RAISE_APPLICATION_ERROR(-20003,'MATRICULA_ATIVA_NAO_ENCONTRADA');
     END IF;
 END;
-/
+
  
--- ------------------
--- TRIGGERS
--- ------------------
+--  ------------------
+-- |  ---TRIGGERS---  |
+--  ------------------
  
 -- 1 Impede que o aluno tenha sua frequência registrada na academia
 -- sem ter sua matrícula ativa, se estiver bloqueada ou tendo sua mensalidade
@@ -67,7 +67,7 @@ BEGIN
         RAISE_APPLICATION_ERROR(-20012,'ALUNO_INADIMPLENTE_HA_MAIS_DE_10_DIAS');
     END IF;
 END;
-/
+
  
 -- 2 Auditoria para realizar as alterações de estado
 -- de estado da matrícula de forma automática
@@ -82,4 +82,3 @@ BEGIN
         VALUES(:NEW.id_matricula,:OLD.status,:NEW.status);
     END IF;
 END;
-/

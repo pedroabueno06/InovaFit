@@ -1,0 +1,503 @@
+Picked up JAVA_TOOL_OPTIONS: -Dstdout.encoding=UTF-8 -Dstderr.encoding=UTF-8
+Conectado ao banco de dados PostgreSQL (schema performance)!
+FASE: ANTES
+
+==============================
+Consulta 1: Pagamentos por matrícula (schema performance)
+===============================
+
+Plano de execução:
+Hash Join  (cost=1181.72..4494.25 rows=3 width=38) (actual time=8.548..32.930 rows=3 loops=1)
+  Hash Cond: (p.id_matricula = m.id_matricula)
+  Buffers: shared hit=1671
+  ->  Seq Scan on pagamento p  (cost=0.00..2750.00 rows=150000 width=38) (actual time=0.011..10.858 rows=150000 loops=1)
+        Buffers: shared hit=1250
+  ->  Hash  (cost=1181.71..1181.71 rows=1 width=8) (actual time=8.430..8.431 rows=1 loops=1)
+        Buckets: 1024  Batches: 1  Memory Usage: 9kB
+        Buffers: shared hit=421
+        ->  Hash Join  (cost=8.44..1181.71 rows=1 width=8) (actual time=0.297..8.428 rows=1 loops=1)
+              Hash Cond: (m.id_aluno = a.id_aluno)
+              Buffers: shared hit=421
+              ->  Seq Scan on matricula m  (cost=0.00..1042.00 rows=50000 width=16) (actual time=0.037..5.473 rows=50000 loops=1)
+                    Filter: ((status)::text = 'ATIVA'::text)
+                    Buffers: shared hit=417
+              ->  Hash  (cost=8.43..8.43 rows=1 width=8) (actual time=0.087..0.087 rows=1 loops=1)
+                    Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                    Buffers: shared hit=4
+                    ->  Index Scan using uk_aluno_email_perf on aluno a  (cost=0.41..8.43 rows=1 width=8) (actual time=0.076..0.077 rows=1 loops=1)
+                          Index Cond: ((email)::text = 'perf777@exemplo.test'::text)
+                          Buffers: shared hit=4
+Planning:
+  Buffers: shared hit=261
+Planning Time: 0.955 ms
+Execution Time: 32.995 ms
+
+Tempo da aplicação (mediana de 100 execuções, inclui JDBC/rede): 13,1190 ms
+
+==============================
+Consulta 2: Pagamentos atrasados por vencimento e status (schema performance)
+===============================
+
+Plano de execução:
+Gather  (cost=1000.00..4111.31 rows=966 width=38) (actual time=4.265..9.320 rows=1000 loops=1)
+  Workers Planned: 1
+  Workers Launched: 1
+  Buffers: shared hit=1250
+  ->  Parallel Seq Scan on pagamento  (cost=0.00..3014.71 rows=568 width=38) (actual time=1.945..5.019 rows=500 loops=2)
+        Filter: (((status)::text = 'ATRASADO'::text) AND (vencimento < (CURRENT_DATE - 10)))
+        Rows Removed by Filter: 74500
+        Buffers: shared hit=1250
+Planning Time: 0.094 ms
+Execution Time: 9.376 ms
+
+Tempo da aplicação (mediana de 100 execuções, inclui JDBC/rede): 7,6427 ms
+Picked up JAVA_TOOL_OPTIONS: -Dstdout.encoding=UTF-8 -Dstderr.encoding=UTF-8
+Conectado ao banco de dados PostgreSQL (schema performance)!
+FASE: DEPOIS
+
+==============================
+Consulta 1: Pagamentos por matrícula (schema performance)
+===============================
+
+Plano de execução:
+Nested Loop  (cost=1.12..17.38 rows=3 width=38) (actual time=0.114..0.125 rows=3 loops=1)
+  Buffers: shared hit=11 read=2
+  ->  Nested Loop  (cost=0.70..16.75 rows=1 width=8) (actual time=0.090..0.091 rows=1 loops=1)
+        Buffers: shared hit=6 read=1
+        ->  Index Scan using uk_aluno_email_perf on aluno a  (cost=0.41..8.43 rows=1 width=8) (actual time=0.064..0.065 rows=1 loops=1)
+              Index Cond: ((email)::text = 'perf777@exemplo.test'::text)
+              Buffers: shared hit=4
+        ->  Index Scan using ix_matricula_id_aluno on matricula m  (cost=0.29..8.31 rows=1 width=16) (actual time=0.024..0.024 rows=1 loops=1)
+              Index Cond: (id_aluno = a.id_aluno)
+              Filter: ((status)::text = 'ATIVA'::text)
+              Buffers: shared hit=2 read=1
+  ->  Index Scan using ix_pagamento_id_matricula on pagamento p  (cost=0.42..0.60 rows=3 width=38) (actual time=0.023..0.032 rows=3 loops=1)
+        Index Cond: (id_matricula = m.id_matricula)
+        Buffers: shared hit=5 read=1
+Planning:
+  Buffers: shared hit=312 read=11
+Planning Time: 1.335 ms
+Execution Time: 0.174 ms
+
+Tempo da aplicação (mediana de 100 execuções, inclui JDBC/rede): 0,6687 ms
+
+==============================
+Consulta 2: Pagamentos atrasados por vencimento e status (schema performance)
+===============================
+
+Plano de execução:
+Bitmap Heap Scan on pagamento  (cost=14.08..1255.87 rows=954 width=38) (actual time=0.224..4.385 rows=1000 loops=1)
+  Recheck Cond: (((status)::text = 'ATRASADO'::text) AND (vencimento < (CURRENT_DATE - 10)))
+  Heap Blocks: exact=833
+  Buffers: shared hit=833 read=2
+  ->  Bitmap Index Scan on ix_pagamento_status_vencimento  (cost=0.00..13.84 rows=954 width=0) (actual time=0.149..0.149 rows=1000 loops=1)
+        Index Cond: (((status)::text = 'ATRASADO'::text) AND (vencimento < (CURRENT_DATE - 10)))
+        Buffers: shared read=2
+Planning:
+  Buffers: shared hit=3
+Planning Time: 0.086 ms
+Execution Time: 4.776 ms
+
+Tempo da aplicação (mediana de 100 execuções, inclui JDBC/rede): 1,5257 ms
+Picked up JAVA_TOOL_OPTIONS: -Dstdout.encoding=UTF-8 -Dstderr.encoding=UTF-8
+Conectado ao schema INOVAFIT_PERF (Oracle)!
+FASE: ANTES
+
+==============================
+Consulta 1: Pagamentos por matrícula (schema INOVAFIT_PERF)
+===============================
+
+Plano de execução:
+-- Plano estimado (EXPLAIN PLAN FOR + DBMS_XPLAN.DISPLAY):
+Plan hash value: 2874287405
+ 
+-----------------------------------------------------------------------------------------------------
+| Id  | Operation                     | Name                | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT              |                     |     3 |   261 |   344   (1)| 00:00:01 |
+|*  1 |  HASH JOIN                    |                     |     3 |   261 |   344   (1)| 00:00:01 |
+|   2 |   NESTED LOOPS                |                     |     1 |    44 |    70   (0)| 00:00:01 |
+|   3 |    TABLE ACCESS BY INDEX ROWID| ALUNO               |     1 |    28 |     2   (0)| 00:00:01 |
+|*  4 |     INDEX UNIQUE SCAN         | UK_ALUNO_EMAIL_PERF |     1 |       |     1   (0)| 00:00:01 |
+|*  5 |    TABLE ACCESS FULL          | MATRICULA           |     1 |    16 |    68   (0)| 00:00:01 |
+|   6 |   TABLE ACCESS FULL           | PAGAMENTO           |   150K|  6298K|   273   (1)| 00:00:01 |
+-----------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - access("M"."ID_MATRICULA"="P"."ID_MATRICULA")
+   4 - access("A"."EMAIL"='perf777@exemplo.test')
+   5 - filter("A"."ID_ALUNO"="M"."ID_ALUNO" AND "M"."STATUS"='ATIVA')
+-- Plano real com estatísticas (DBMS_XPLAN.DISPLAY_CURSOR, ALLSTATS LAST):
+User has no SELECT privilege on V$SESSION
+
+Tempo da aplicação (mediana de 100 execuções, inclui JDBC/rede): 9,6649 ms
+
+==============================
+Consulta 2: Pagamentos atrasados por vencimento e status (schema INOVAFIT_PERF)
+===============================
+
+Plano de execução:
+-- Plano estimado (EXPLAIN PLAN FOR + DBMS_XPLAN.DISPLAY):
+Plan hash value: 1215750052
+ 
+-------------------------------------------------------------------------------
+| Id  | Operation         | Name      | Rows  | Bytes | Cost (%CPU)| Time     |
+-------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |           | 70082 |  2942K|   276   (2)| 00:00:01 |
+|*  1 |  TABLE ACCESS FULL| PAGAMENTO | 70082 |  2942K|   276   (2)| 00:00:01 |
+-------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - filter("STATUS"='ATRASADO' AND "VENCIMENTO"<TRUNC(SYSDATE@!)-10)
+-- Plano real com estatísticas (DBMS_XPLAN.DISPLAY_CURSOR, ALLSTATS LAST):
+User has no SELECT privilege on V$SESSION
+
+Tempo da aplicação (mediana de 100 execuções, inclui JDBC/rede): 6,5806 ms
+Picked up JAVA_TOOL_OPTIONS: -Dstdout.encoding=UTF-8 -Dstderr.encoding=UTF-8
+Conectado ao schema INOVAFIT_PERF (Oracle)!
+FASE: ANTES
+
+==============================
+Consulta 1: Pagamentos por matrícula (schema INOVAFIT_PERF)
+===============================
+
+Plano de execução:
+-- Plano estimado (EXPLAIN PLAN FOR + DBMS_XPLAN.DISPLAY):
+Plan hash value: 2874287405
+ 
+-----------------------------------------------------------------------------------------------------
+| Id  | Operation                     | Name                | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT              |                     |     3 |   261 |   344   (1)| 00:00:01 |
+|*  1 |  HASH JOIN                    |                     |     3 |   261 |   344   (1)| 00:00:01 |
+|   2 |   NESTED LOOPS                |                     |     1 |    44 |    70   (0)| 00:00:01 |
+|   3 |    TABLE ACCESS BY INDEX ROWID| ALUNO               |     1 |    28 |     2   (0)| 00:00:01 |
+|*  4 |     INDEX UNIQUE SCAN         | UK_ALUNO_EMAIL_PERF |     1 |       |     1   (0)| 00:00:01 |
+|*  5 |    TABLE ACCESS FULL          | MATRICULA           |     1 |    16 |    68   (0)| 00:00:01 |
+|   6 |   TABLE ACCESS FULL           | PAGAMENTO           |   150K|  6298K|   273   (1)| 00:00:01 |
+-----------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - access("M"."ID_MATRICULA"="P"."ID_MATRICULA")
+   4 - access("A"."EMAIL"='perf777@exemplo.test')
+   5 - filter("A"."ID_ALUNO"="M"."ID_ALUNO" AND "M"."STATUS"='ATIVA')
+-- Plano real com estatísticas (DBMS_XPLAN.DISPLAY_CURSOR, ALLSTATS LAST):
+User has no SELECT privilege on V$SQL_PLAN_STATISTICS_ALL
+
+Tempo da aplicação (mediana de 100 execuções, inclui JDBC/rede): 9,3785 ms
+
+==============================
+Consulta 2: Pagamentos atrasados por vencimento e status (schema INOVAFIT_PERF)
+===============================
+
+Plano de execução:
+-- Plano estimado (EXPLAIN PLAN FOR + DBMS_XPLAN.DISPLAY):
+Plan hash value: 1215750052
+ 
+-------------------------------------------------------------------------------
+| Id  | Operation         | Name      | Rows  | Bytes | Cost (%CPU)| Time     |
+-------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |           | 70082 |  2942K|   276   (2)| 00:00:01 |
+|*  1 |  TABLE ACCESS FULL| PAGAMENTO | 70082 |  2942K|   276   (2)| 00:00:01 |
+-------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - filter("STATUS"='ATRASADO' AND "VENCIMENTO"<TRUNC(SYSDATE@!)-10)
+-- Plano real com estatísticas (DBMS_XPLAN.DISPLAY_CURSOR, ALLSTATS LAST):
+User has no SELECT privilege on V$SQL_PLAN_STATISTICS_ALL
+
+Tempo da aplicação (mediana de 100 execuções, inclui JDBC/rede): 6,3680 ms
+Picked up JAVA_TOOL_OPTIONS: -Dstdout.encoding=UTF-8 -Dstderr.encoding=UTF-8
+Conectado ao schema INOVAFIT_PERF (Oracle)!
+FASE: ANTES
+
+==============================
+Consulta 1: Pagamentos por matrícula (schema INOVAFIT_PERF)
+===============================
+
+Plano de execução:
+-- Plano estimado (EXPLAIN PLAN FOR + DBMS_XPLAN.DISPLAY):
+Plan hash value: 2874287405
+ 
+-----------------------------------------------------------------------------------------------------
+| Id  | Operation                     | Name                | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT              |                     |     3 |   261 |   344   (1)| 00:00:01 |
+|*  1 |  HASH JOIN                    |                     |     3 |   261 |   344   (1)| 00:00:01 |
+|   2 |   NESTED LOOPS                |                     |     1 |    44 |    70   (0)| 00:00:01 |
+|   3 |    TABLE ACCESS BY INDEX ROWID| ALUNO               |     1 |    28 |     2   (0)| 00:00:01 |
+|*  4 |     INDEX UNIQUE SCAN         | UK_ALUNO_EMAIL_PERF |     1 |       |     1   (0)| 00:00:01 |
+|*  5 |    TABLE ACCESS FULL          | MATRICULA           |     1 |    16 |    68   (0)| 00:00:01 |
+|   6 |   TABLE ACCESS FULL           | PAGAMENTO           |   150K|  6298K|   273   (1)| 00:00:01 |
+-----------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - access("M"."ID_MATRICULA"="P"."ID_MATRICULA")
+   4 - access("A"."EMAIL"='perf777@exemplo.test')
+   5 - filter("A"."ID_ALUNO"="M"."ID_ALUNO" AND "M"."STATUS"='ATIVA')
+-- Plano real com estatísticas (DBMS_XPLAN.DISPLAY_CURSOR, ALLSTATS LAST):
+User has no SELECT privilege on V$SQL_PLAN_STATISTICS_ALL
+
+Tempo da aplicação (mediana de 100 execuções, inclui JDBC/rede): 9,2382 ms
+
+==============================
+Consulta 2: Pagamentos atrasados por vencimento e status (schema INOVAFIT_PERF)
+===============================
+
+Plano de execução:
+-- Plano estimado (EXPLAIN PLAN FOR + DBMS_XPLAN.DISPLAY):
+Plan hash value: 1215750052
+ 
+-------------------------------------------------------------------------------
+| Id  | Operation         | Name      | Rows  | Bytes | Cost (%CPU)| Time     |
+-------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |           | 70082 |  2942K|   276   (2)| 00:00:01 |
+|*  1 |  TABLE ACCESS FULL| PAGAMENTO | 70082 |  2942K|   276   (2)| 00:00:01 |
+-------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - filter("STATUS"='ATRASADO' AND "VENCIMENTO"<TRUNC(SYSDATE@!)-10)
+-- Plano real com estatísticas (DBMS_XPLAN.DISPLAY_CURSOR, ALLSTATS LAST):
+User has no SELECT privilege on V$SQL_PLAN_STATISTICS_ALL
+
+Tempo da aplicação (mediana de 100 execuções, inclui JDBC/rede): 6,2544 ms
+Picked up JAVA_TOOL_OPTIONS: -Dstdout.encoding=UTF-8 -Dstderr.encoding=UTF-8
+Conectado ao schema INOVAFIT_PERF (Oracle)!
+FASE: ANTES
+
+==============================
+Consulta 1: Pagamentos por matrícula (schema INOVAFIT_PERF)
+===============================
+
+Plano de execução:
+-- Plano estimado (EXPLAIN PLAN FOR + DBMS_XPLAN.DISPLAY):
+Plan hash value: 2874287405
+ 
+-----------------------------------------------------------------------------------------------------
+| Id  | Operation                     | Name                | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT              |                     |     3 |   261 |   344   (1)| 00:00:01 |
+|*  1 |  HASH JOIN                    |                     |     3 |   261 |   344   (1)| 00:00:01 |
+|   2 |   NESTED LOOPS                |                     |     1 |    44 |    70   (0)| 00:00:01 |
+|   3 |    TABLE ACCESS BY INDEX ROWID| ALUNO               |     1 |    28 |     2   (0)| 00:00:01 |
+|*  4 |     INDEX UNIQUE SCAN         | UK_ALUNO_EMAIL_PERF |     1 |       |     1   (0)| 00:00:01 |
+|*  5 |    TABLE ACCESS FULL          | MATRICULA           |     1 |    16 |    68   (0)| 00:00:01 |
+|   6 |   TABLE ACCESS FULL           | PAGAMENTO           |   150K|  6298K|   273   (1)| 00:00:01 |
+-----------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - access("M"."ID_MATRICULA"="P"."ID_MATRICULA")
+   4 - access("A"."EMAIL"='perf777@exemplo.test')
+   5 - filter("A"."ID_ALUNO"="M"."ID_ALUNO" AND "M"."STATUS"='ATIVA')
+-- Plano real com estatísticas (DBMS_XPLAN.DISPLAY_CURSOR, ALLSTATS LAST):
+SQL_ID  44w4ruj8cktkg, child number 0
+-------------------------------------
+SELECT /*+ GATHER_PLAN_STATISTICS */ p.* FROM pagamento p JOIN 
+matricula m     ON m.id_matricula = p.id_matricula JOIN aluno a     ON 
+a.id_aluno = m.id_aluno WHERE a.email = 'perf777@exemplo.test' AND 
+m.status = 'ATIVA'
+ 
+Plan hash value: 2874287405
+ 
+------------------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation                     | Name                | Starts | E-Rows | A-Rows |   A-Time   | Buffers |  OMem |  1Mem | Used-Mem |
+------------------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT              |                     |      1 |        |      3 |00:00:00.02 |    1254 |       |       |          |
+|*  1 |  HASH JOIN                    |                     |      1 |      3 |      3 |00:00:00.02 |    1254 |  2402K|  2402K|  819K (0)|
+|   2 |   NESTED LOOPS                |                     |      1 |      1 |      1 |00:00:00.01 |     250 |       |       |          |
+|   3 |    TABLE ACCESS BY INDEX ROWID| ALUNO               |      1 |      1 |      1 |00:00:00.01 |       3 |       |       |          |
+|*  4 |     INDEX UNIQUE SCAN         | UK_ALUNO_EMAIL_PERF |      1 |      1 |      1 |00:00:00.01 |       2 |       |       |          |
+|*  5 |    TABLE ACCESS FULL          | MATRICULA           |      1 |      1 |      1 |00:00:00.01 |     247 |       |       |          |
+|   6 |   TABLE ACCESS FULL           | PAGAMENTO           |      1 |    150K|    150K|00:00:00.01 |    1004 |       |       |          |
+------------------------------------------------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - access("M"."ID_MATRICULA"="P"."ID_MATRICULA")
+   4 - access("A"."EMAIL"='perf777@exemplo.test')
+   5 - filter(("A"."ID_ALUNO"="M"."ID_ALUNO" AND "M"."STATUS"='ATIVA'))
+ 
+
+Tempo da aplicação (mediana de 100 execuções, inclui JDBC/rede): 9,2151 ms
+
+==============================
+Consulta 2: Pagamentos atrasados por vencimento e status (schema INOVAFIT_PERF)
+===============================
+
+Plano de execução:
+-- Plano estimado (EXPLAIN PLAN FOR + DBMS_XPLAN.DISPLAY):
+Plan hash value: 1215750052
+ 
+-------------------------------------------------------------------------------
+| Id  | Operation         | Name      | Rows  | Bytes | Cost (%CPU)| Time     |
+-------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |           | 70082 |  2942K|   276   (2)| 00:00:01 |
+|*  1 |  TABLE ACCESS FULL| PAGAMENTO | 70082 |  2942K|   276   (2)| 00:00:01 |
+-------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - filter("STATUS"='ATRASADO' AND "VENCIMENTO"<TRUNC(SYSDATE@!)-10)
+-- Plano real com estatísticas (DBMS_XPLAN.DISPLAY_CURSOR, ALLSTATS LAST):
+SQL_ID  3mzz6u9phu85x, child number 1
+-------------------------------------
+SELECT /*+ GATHER_PLAN_STATISTICS */ * FROM pagamento WHERE status = 
+'ATRASADO' AND vencimento < TRUNC(SYSDATE) - 10
+ 
+Plan hash value: 1215750052
+ 
+-----------------------------------------------------------------------------------------
+| Id  | Operation         | Name      | Starts | E-Rows | A-Rows |   A-Time   | Buffers |
+-----------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |           |      1 |        |   1000 |00:00:00.01 |    1010 |
+|*  1 |  TABLE ACCESS FULL| PAGAMENTO |      1 |   1000 |   1000 |00:00:00.01 |    1010 |
+-----------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - filter(("STATUS"='ATRASADO' AND "VENCIMENTO"<TRUNC(SYSDATE@!)-10))
+ 
+Note
+-----
+   - statistics feedback used for this statement
+ 
+
+Tempo da aplicação (mediana de 100 execuções, inclui JDBC/rede): 6,4202 ms
+Picked up JAVA_TOOL_OPTIONS: -Dstdout.encoding=UTF-8 -Dstderr.encoding=UTF-8
+Conectado ao schema INOVAFIT_PERF (Oracle)!
+FASE: DEPOIS
+
+==============================
+Consulta 1: Pagamentos por matrícula (schema INOVAFIT_PERF)
+===============================
+
+Plano de execução:
+-- Plano estimado (EXPLAIN PLAN FOR + DBMS_XPLAN.DISPLAY):
+Plan hash value: 2890157820
+ 
+--------------------------------------------------------------------------------------------------------------------
+| Id  | Operation                              | Name                      | Rows  | Bytes | Cost (%CPU)| Time     |
+--------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                       |                           |     3 |   261 |     6   (0)| 00:00:01 |
+|   1 |  NESTED LOOPS                          |                           |     3 |   261 |     6   (0)| 00:00:01 |
+|   2 |   NESTED LOOPS                         |                           |     3 |   261 |     6   (0)| 00:00:01 |
+|   3 |    NESTED LOOPS                        |                           |     1 |    44 |     4   (0)| 00:00:01 |
+|   4 |     TABLE ACCESS BY INDEX ROWID        | ALUNO                     |     1 |    28 |     2   (0)| 00:00:01 |
+|*  5 |      INDEX UNIQUE SCAN                 | UK_ALUNO_EMAIL_PERF       |     1 |       |     1   (0)| 00:00:01 |
+|*  6 |     TABLE ACCESS BY INDEX ROWID BATCHED| MATRICULA                 |     1 |    16 |     2   (0)| 00:00:01 |
+|*  7 |      INDEX RANGE SCAN                  | IX_MATRICULA_ID_ALUNO     |     1 |       |     1   (0)| 00:00:01 |
+|*  8 |    INDEX RANGE SCAN                    | IX_PAGAMENTO_ID_MATRICULA |     3 |       |     1   (0)| 00:00:01 |
+|   9 |   TABLE ACCESS BY INDEX ROWID          | PAGAMENTO                 |     3 |   129 |     2   (0)| 00:00:01 |
+--------------------------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   5 - access("A"."EMAIL"='perf777@exemplo.test')
+   6 - filter("M"."STATUS"='ATIVA')
+   7 - access("A"."ID_ALUNO"="M"."ID_ALUNO")
+   8 - access("M"."ID_MATRICULA"="P"."ID_MATRICULA")
+ 
+Note
+-----
+   - this is an adaptive plan
+-- Plano real com estatísticas (DBMS_XPLAN.DISPLAY_CURSOR, ALLSTATS LAST):
+SQL_ID  44w4ruj8cktkg, child number 0
+-------------------------------------
+SELECT /*+ GATHER_PLAN_STATISTICS */ p.* FROM pagamento p JOIN 
+matricula m     ON m.id_matricula = p.id_matricula JOIN aluno a     ON 
+a.id_aluno = m.id_aluno WHERE a.email = 'perf777@exemplo.test' AND 
+m.status = 'ATIVA'
+ 
+Plan hash value: 2890157820
+ 
+------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation                              | Name                      | Starts | E-Rows | A-Rows |   A-Time   | Buffers |
+------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                       |                           |      1 |        |      3 |00:00:00.01 |       9 |
+|   1 |  NESTED LOOPS                          |                           |      1 |      3 |      3 |00:00:00.01 |       9 |
+|   2 |   NESTED LOOPS                         |                           |      1 |      3 |      3 |00:00:00.01 |       8 |
+|   3 |    NESTED LOOPS                        |                           |      1 |      1 |      1 |00:00:00.01 |       6 |
+|   4 |     TABLE ACCESS BY INDEX ROWID        | ALUNO                     |      1 |      1 |      1 |00:00:00.01 |       3 |
+|*  5 |      INDEX UNIQUE SCAN                 | UK_ALUNO_EMAIL_PERF       |      1 |      1 |      1 |00:00:00.01 |       2 |
+|*  6 |     TABLE ACCESS BY INDEX ROWID BATCHED| MATRICULA                 |      1 |      1 |      1 |00:00:00.01 |       3 |
+|*  7 |      INDEX RANGE SCAN                  | IX_MATRICULA_ID_ALUNO     |      1 |      1 |      1 |00:00:00.01 |       2 |
+|*  8 |    INDEX RANGE SCAN                    | IX_PAGAMENTO_ID_MATRICULA |      1 |      3 |      3 |00:00:00.01 |       2 |
+|   9 |   TABLE ACCESS BY INDEX ROWID          | PAGAMENTO                 |      3 |      3 |      3 |00:00:00.01 |       1 |
+------------------------------------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   5 - access("A"."EMAIL"='perf777@exemplo.test')
+   6 - filter("M"."STATUS"='ATIVA')
+   7 - access("A"."ID_ALUNO"="M"."ID_ALUNO")
+   8 - access("M"."ID_MATRICULA"="P"."ID_MATRICULA")
+ 
+Note
+-----
+   - this is an adaptive plan
+ 
+
+Tempo da aplicação (mediana de 100 execuções, inclui JDBC/rede): 0,8450 ms
+
+==============================
+Consulta 2: Pagamentos atrasados por vencimento e status (schema INOVAFIT_PERF)
+===============================
+
+Plano de execução:
+-- Plano estimado (EXPLAIN PLAN FOR + DBMS_XPLAN.DISPLAY):
+Plan hash value: 3632884859
+ 
+----------------------------------------------------------------------------------------------------------------------
+| Id  | Operation                           | Name                           | Rows  | Bytes | Cost (%CPU)| Time     |
+----------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                    |                                |  1000 | 43000 |    36   (0)| 00:00:01 |
+|   1 |  TABLE ACCESS BY INDEX ROWID BATCHED| PAGAMENTO                      |  1000 | 43000 |    36   (0)| 00:00:01 |
+|*  2 |   INDEX RANGE SCAN                  | IX_PAGAMENTO_STATUS_VENCIMENTO |  1000 |       |     6   (0)| 00:00:01 |
+----------------------------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   2 - access("STATUS"='ATRASADO' AND "VENCIMENTO"<TRUNC(SYSDATE@!)-10)
+-- Plano real com estatísticas (DBMS_XPLAN.DISPLAY_CURSOR, ALLSTATS LAST):
+SQL_ID  3mzz6u9phu85x, child number 1
+-------------------------------------
+SELECT /*+ GATHER_PLAN_STATISTICS */ * FROM pagamento WHERE status = 
+'ATRASADO' AND vencimento < TRUNC(SYSDATE) - 10
+ 
+Plan hash value: 3632884859
+ 
+--------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation                           | Name                           | Starts | E-Rows | A-Rows |   A-Time   | Buffers |
+--------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                    |                                |      1 |        |   1000 |00:00:00.01 |    1012 |
+|   1 |  TABLE ACCESS BY INDEX ROWID BATCHED| PAGAMENTO                      |      1 |   1000 |   1000 |00:00:00.01 |    1012 |
+|*  2 |   INDEX RANGE SCAN                  | IX_PAGAMENTO_STATUS_VENCIMENTO |      1 |   1000 |   1000 |00:00:00.01 |      12 |
+--------------------------------------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   2 - access("STATUS"='ATRASADO' AND "VENCIMENTO"<TRUNC(SYSDATE@!)-10)
+ 
+
+Tempo da aplicação (mediana de 100 execuções, inclui JDBC/rede): 4,6431 ms

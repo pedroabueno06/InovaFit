@@ -2,7 +2,7 @@
 --| ---PROCEDURES--- |
 -- ------------------
 
--- 1 RetornaPAGO, PENDENTE OU ATRASADOpelo parâmetro OUT,
+-- 1 Retorna PAGO, PENDENTE OU ATRASADO pelo parâmetro OUT,
 -- Se o pagamento não existir, é gerado um erro de negócio.
 CREATE OR REPLACE PROCEDURE registrar_pagamento(
     IN p_id_pagamento BIGINT,
@@ -44,9 +44,9 @@ BEGIN
 END;
 $$;
  
--- ------------------
--- TRIGGERS
--- ------------------
+--  ------------------
+-- |  ---TRIGGERS---  |
+--  ------------------
  
 -- 1 Impede que o aluno tenha sua frequência registrada na academia
 -- sem ter sua matrícula ativa, se estiver bloqueada ou tendo sua mensalidade
@@ -67,9 +67,7 @@ BEGIN
             ERRCODE = 'P2001',
             MESSAGE = 'MATRICULA_INATIVA_OU_BLOQUEADA';
     END IF;
- 
-    -- Mesma regra do Oracle: mensalidade nao paga vencida ha MAIS de 10 dias
-    -- (exatamente 10 dias ainda e permitido).
+
     IF EXISTS (
         SELECT 1
         FROM pagamento p
