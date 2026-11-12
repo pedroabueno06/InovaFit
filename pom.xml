@@ -42,6 +42,7 @@
 
     <build>
         <sourceDirectory>${project.basedir}/java/InovaFit/src/main/java</sourceDirectory>
+        <testSourceDirectory>${project.basedir}/tests/java</testSourceDirectory>
         <plugins>
             <!-- Reconhece a pasta performance -->
             <plugin>
