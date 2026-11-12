@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 public class InovafitTest {
     private record Banco(String nome, String url, String usuario, String senha, boolean oracle) {}
 
-    //1- Testa a conexão com os dois bancos de dados
+    //11- Testa a conexão com os dois bancos de dados
     @Test
     void conexoesComOsDoisBancosDeDados() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados(((banco, connection) -> {
@@ -22,7 +22,7 @@ public class InovafitTest {
         }));
     }
 
-    //2- Testa se a classe Inovafit.java inicia e encerra pelo seu menu()
+    //12- Testa se a classe Inovafit.java inicia e encerra pelo seu menu()
     @Test
     void InovafitIniciaEEncerraPeloMenu() {
         InputStream entradaOriginal = System.in;

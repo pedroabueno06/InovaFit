@@ -21,7 +21,7 @@ public class PostgreSQL extends Motor {
         };
     }
 
-    @Override 
+    @Override
     protected String[] consultas() {
         return new String[] {
             """
@@ -31,7 +31,7 @@ public class PostgreSQL extends Motor {
                 SELECT m.id_matricula
                 FROM matricula m
                 JOIN aluno a ON a.id_aluno = m.id_aluno
-                WHERE a.email = 'ascencobuenomiguel@gmail.com'
+                WHERE a.email = 'perf777@exemplo.test'
             )
             """,
 

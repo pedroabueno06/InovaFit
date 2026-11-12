@@ -1,6 +1,6 @@
- ------------------
-| ---PROCEDURES--- |
- ------------------
+-- ------------------
+--| ---PROCEDURES--- |
+-- ------------------
 
 -- 1 RetornaPAGO, PENDENTE OU ATRASADOpelo parâmetro OUT,
 -- Se o pagamento não existir, é gerado um erro de negócio.
@@ -15,7 +15,7 @@ BEGIN
     INTO p_status_pagamento
     FROM pagamento
     WHERE id_pagamento = p_id_pagamento;
-
+ 
     IF NOT FOUND THEN
         RAISE EXCEPTION USING
             ERRCODE = 'P1001',
@@ -23,7 +23,7 @@ BEGIN
     END IF;
 END;
 $$;
-
+ 
 -- 2 Após ter a matrícula cancelada, a mesma tem seu estado alterado e vigência encerrada
 CREATE OR REPLACE PROCEDURE cancelar_matricula(p_id_matricula BIGINT)
     LANGUAGE plpgsql
@@ -35,7 +35,7 @@ BEGIN
         bloqueada = TRUE
     WHERE id_matricula = p_id_matricula
         AND status='ATIVA';
-
+ 
     IF NOT FOUND THEN
         RAISE EXCEPTION USING 
         ERRCODE='P1003',
@@ -43,11 +43,11 @@ BEGIN
     END IF;
 END;
 $$;
-
- ------------------
-|  ---TRIGGERS---  |
- ------------------
-
+ 
+-- ------------------
+-- TRIGGERS
+-- ------------------
+ 
 -- 1 Impede que o aluno tenha sua frequência registrada na academia
 -- sem ter sua matrícula ativa, se estiver bloqueada ou tendo sua mensalidade
 -- atrasada em mais de 10 dias
@@ -67,16 +67,30 @@ BEGIN
             ERRCODE = 'P2001',
             MESSAGE = 'MATRICULA_INATIVA_OU_BLOQUEADA';
     END IF;
-
+ 
+    -- Mesma regra do Oracle: mensalidade nao paga vencida ha MAIS de 10 dias
+    -- (exatamente 10 dias ainda e permitido).
+    IF EXISTS (
+        SELECT 1
+        FROM pagamento p
+        WHERE p.id_matricula = NEW.id_matricula
+          AND p.status <> 'PAGO'
+          AND p.vencimento < CURRENT_DATE - 10
+    ) THEN
+        RAISE EXCEPTION USING
+            ERRCODE = 'P2002',
+            MESSAGE = 'ALUNO_INADIMPLENTE_HA_MAIS_DE_10_DIAS';
+    END IF;
+ 
     RETURN NEW;
 END;
 $$;
-
+ 
 CREATE TRIGGER trg_validar_frequencia
     BEFORE INSERT ON frequencia
     FOR EACH ROW
 EXECUTE FUNCTION fn_validar_frequencia();
-
+ 
 -- 2 Auditoria para realizar as alterações
 -- de estado da matrícula de forma automática
 CREATE OR REPLACE FUNCTION fn_auditar_matricula()

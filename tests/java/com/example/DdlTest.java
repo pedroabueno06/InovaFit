@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 public class DdlTest {
     private static final List<String> TABELAS = List.of("aluno", "plano", "modalidade", "matricula", "matricula_modalidade", "pagamento", "frequencia", "auditoria_matricula");
 
-    //15- Testa se todas as oito tabelas do projeto existem nos dois bancos
+    //7- Testa se todas as oito tabelas do projeto existem nos dois bancos
     @Test
     void tabelasDoProjeetoExistem() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados((banco, connection) -> {
@@ -28,7 +28,7 @@ public class DdlTest {
         });
     }
 
-    //16- Testa se todas as tabelas possuem uma chave primária
+    //8- Testa se todas as tabelas possuem uma chave primária
     @Test
     void todasAsTabelasPossuemChavePrimaria() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados((banco, connection) -> {
@@ -45,7 +45,7 @@ public class DdlTest {
         });
     }
 
-    //17- Testa se existem relacionamentos por chaves estrangeiras
+    //9- Testa se existem relacionamentos por chaves estrangeiras
     @Test
 void relacionamentosPorChavesEstrangeirasExistem() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados((banco, connection) -> {

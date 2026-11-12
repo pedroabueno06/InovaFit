@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class IndicesTest {
-    //14- Testa se os índices do projeto estão criados
+    //10- Testa se os índices do projeto estão criados
     @Test
     void indicesDoProjetoEstaoCriados() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados((banco, connection) -> {

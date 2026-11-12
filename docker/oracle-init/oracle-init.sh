@@ -14,10 +14,10 @@ EXIT
 SQL
 }
 
-rodar /scripts/oracle/Ddl.sql
-rodar /scripts/oracle/Inserts.sql
-rodar /scripts/procedures/Oracle_procedures.sql
-rodar /scripts/oracle/Indices.sql
+rodar /scripts/oracle/ddl.sql
+rodar /scripts/oracle/inserts.sql
+rodar /scripts/procedures/oracle_procedures.sql
+rodar /scripts/oracle/indices.sql
 
 erros=$(sqlplus -s -L "$CONNECTION" <<SQL
 WHENEVER SQLERROR EXIT SQL.SQLCODE

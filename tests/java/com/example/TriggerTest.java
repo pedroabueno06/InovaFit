@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 public class TriggerTest {
     
-    //11- Testa se o trigger permite emitir frequência para uma matrícula ativa
+    //17- Testa se o trigger permite emitir frequência para uma matrícula ativa
     @Test
     void triggerPermiteFrequenciaParaMatriculaAtiva() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados((banco, connection) -> {
@@ -19,7 +19,7 @@ public class TriggerTest {
         });
     }
 
-    //12-Testa se o trigger permite emitir frequência para uma matrícula cancelada
+    //18-Testa se o trigger permite emitir frequência para uma matrícula cancelada
     @Test
     void triggerRejeitaFrequenciaParaMatriculaCancelada() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados((banco, connection) -> {
@@ -29,11 +29,10 @@ public class TriggerTest {
         });
     }
 
-    //13- Testa se o trigger do banco de dados Oracle rejeita uma matrícula com um atraso superior de dez dias
+    //19- Testa se o trigger do banco de dados Oracle rejeita uma matrícula com um atraso superior de dez dias
     @Test
-    void triggerOracleRejeitaMatriculaComAtrasoSuperiorADezDias() throws Exception {
+    void triggerRejeitaMatriculaComAtrasoSuperiorADezDias() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados((banco, connection) -> {
-            if (!banco.oracle()) return; // a versão PostgreSQL atual não implementa essa regra no trigger
             try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO frequencia(id_matricula) VALUES(3)")) {
                 SQLException erro = assertThrows(SQLException.class, preparedStatement::executeUpdate);
                 assertTrue(erro.getMessage().contains("ALUNO_INADIMPLENTE_HA_MAIS_DE_10_DIAS"));
@@ -43,3 +42,4 @@ public class TriggerTest {
         });
     }
 }
+

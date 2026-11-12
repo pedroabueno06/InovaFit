@@ -1,14 +1,14 @@
 INSERT INTO aluno(nome,email,data_nascimento,data_cadastro)
-    VALUES('Pedro Ascenço Bueno', 'pedro.ascenco@gmail.com',
+    VALUES('Pedro Ascenço Bueno', 'aluno1@exemplo.com',
     DATE '2006-05-15', CURRENT_DATE-INTERVAL '14 months'),
 
-    ('Joaquim Attanasio da Silva', 'jattanasio57@gmail.com',
+    ('Joaquim Attanasio da Silva', 'aluno2@exemplo.com',
     DATE '2006-06-16', CURRENT_DATE-INTERVAL '3 months'),
 
-    ('Gabriel Gastal', 'gabrielgastal2017@gmail.com',
+    ('Gabriel Gastal', 'aluno3@exemplo.com',
     DATE '2005-07-17', CURRENT_DATE-INTERVAL '16 months'),
 
-    ('Fabrício Lopes', 'fabrilopes403@gmail.com',
+    ('Fabrício Lopes', 'aluno4@exemplo.com',
     DATE '2007-08-18', CURRENT_DATE-INTERVAL '2 months');
 
 INSERT INTO  plano(nome,valor_mensal,duracao_meses)

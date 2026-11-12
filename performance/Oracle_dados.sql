@@ -1,81 +1,72 @@
 -- São inseridas cargas de dados para testar a performace do nosso projeto "InovaFit"
+-- Os dados de cargas de dados podem ser identificados pelo email 'perf<N>@exemplo.test'
+-- no qual são todos fictícios, com isso será possível apagar apenas a carga sem mexer nos dados de exemplo.
 
--- Cadastro de aluno
-MERGE INTO aluno a
-USING (
-    SELECT 'Miguel Ascenc Bueno' AS NOME,
-           'ascencobuenomiguel@gmail.com' AS email
-    FROM dual
-) dados
-ON (a.email = dados.email)
-WHEN NOT MATCHED THEN
-    INSERT (nome,email,data_nascimento)
-        VALUES (dados.nome, dados.email, DATE '2014-10-16');
-
--- Cria uma matrícula exclusiva para o aluno cadastrado
-INSERT INTO matricula (id_aluno,id_plano,data_inicio,data_fim,status,bloqueada)
-    SELECT a.id_aluno,p.id_plano,
-        TRUNC(SYSDATE) - 30,
-        TRUNC(SYSDATE),
-        'CANCELADA',
-        0
-    FROM alunoa
-    CROSS JOIN plano p
-WHERE a.email = 'ascencobuenomiguel@gmail.com'
-    AND p.nome = 'Mensal'
-    AND NOT EXISTS (
-        SELECT 1
-        FROM matricula m
-    WHERE m.id_aluno = a.id_aluno
-    );
-
--- Realiza a remoção de pagaemntos anteriores deste aluno
+-- Realiza a remoção de uma carga anterior (pagamento), assim
+-- é possível rodar o script mais de uma vez.
 DELETE FROM pagamento
-WHERE id_matricula = (
+WHERE id_matricula IN (
     SELECT m.id_matricula
-    FROM matricula m 
+    FROM matricula m
     JOIN aluno a ON a.id_aluno = m.id_aluno
-    WHERE a.email = 'ascencobuenomiguel@gmail.com'
+    WHERE a.email LIKE 'perf%@exemplo.test'
 );
 
--- São inseridos 30 mil pagamentos
-INSERT INTO pagamento (id_matricul,competencia,vencimento,data_pagamento,valor,status)
-    SELECT m.id_matricula
-        ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -LEVEL),
-        ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -LEVEL) + 5,
+DELETE FROM matricula
+WHERE id_aluno IN (
+    SELECT id_aluno FROM aluno WHERE email LIKE 'perf%@exemplo.test'
+);
 
-        CASE
-            WHEN MOD(LEVEL, 4) = 0 THEN
-                ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -LEVEL) +2
-            END NULL
-        END,
+DELETE FROM aluno WHERE email LIKE 'perf%@exemplo.test';
 
-        10.00,
-
-        CASE
-            WHEN MOD(LEVEL, 4) = 0 THEN 'PAGO'
-            WHEN MOD(LEVEL, 4) = 1 THEN 'ATRASADO'
-            ELSE 'PENDENTE'
-        END
-    
+-- São cadastrados 50 mil alunos.
+INSERT INTO aluno (nome, email, data_nascimento)
+    SELECT 'Aluno Perf ' || LEVEL, 'perf' || LEVEL || '@exemplo.test',
+        DATE '2000-01-01'
     FROM dual
-    CROS JOIN matricula m
-    JOIN aluno a ON a.id_aluno = m.id_aluno
-WHERE a.email = 'ascencobuenomiguel@gmail.com'
-    CONECT BY LEVEL <= 30000;
+    CONNECT BY LEVEL <= 50000;
+
+-- Cria uma matricula ativa para cada aluno da carga de dados no plano mensal
+INSERT INTO matricula (id_aluno, id_plano, data_inicio, status, bloqueada)
+    SELECT a.id_aluno, p.id_plano, TRUNC(SYSDATE) - 90 'ATIVA', 0
+    FROM aluno a
+    CROSS JOIN plano p
+    WHERE a.email LIKE 'perf%@exemplo.test'
+        AND UPPERp.nome = 'MENSAL';
+
+-- São inseridos 150 mil pagamentos, além de 3 competências (do mês atual e 2 anteriores)
+-- por matrícula cadastrada. Foi deixado cerca de 1% das matrículas como ATRASADAS,
+-- o restante das mesmas foi deixado como PAGO
+INSERT INTO pagamento (id_matricula, competencia, vencimento, data_pagamento, valor, status)
+    SELECT x.id_matricula, x.competencia, x.competencia + 5,
+        CASE WHEN MOD(x.id_matricula, 100) = 0 THEN NULL ELSE x.competencia + 2 
+    END,
+    120,
+        CASE WHEN MOD(x.id_matricula, 100) = 0 THEN 'ATRASADO' ELSE 'PAGO' 
+    END
+    FROM (
+        SELECT m.id_matricula,
+            ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -k.n) AS competencia
+        FROM matricula m
+        JOIN aluno a ON a.id_aluno = m.id_aluno
+        CROSS JOIN (SELECT LEVEL - 1 AS n FROM dual CONNECT BY LEVEL <= 3) k
+        WHERE a.email LIKE 'perf%@exemplo.test'
+    ) x;
+
+COMMIT;
 
 -- Realiza uma atualização nas estatísticas do banco de dados
 BEGIN
     DBMS_STATS.GATHER_TABLE_STATS(USER, 'ALUNO');
     DBMS_STATS.GATHER_TABLE_STATS(USER, 'MATRICULA');
-    DBMS_STATS.GATHER_TABLE_STATS(USER, 'PAGEMENTO');
+    DBMS_STATS.GATHER_TABLE_STATS(USER, 'PAGAMENTO');
 END;
 /
-COMMIT;
 
--- Realiza a conferência da quantidade registros feitos
+-- Realiza a conferência da quantidade registros feitos,
+-- sendo esperados cerca de 150000 registros feitos
 SELECT COUNT(*) AS total_pagamentos
-    FROM pagamentos p
+    FROM pagamento p
     JOIN matricula m ON m.id_matricula = p.id_matricula
     JOIN aluno a ON a.id_aluno = m.id_aluno
-WHERE a.email = 'ascencobuenomigue@gmail.com';
+WHERE a.email = 'perf%@exemplo.test';

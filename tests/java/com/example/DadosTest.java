@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 public class DadosTest {
 
-    // 3 - Testa se o projeto possui uma estrutura com dados de carga
+    //4- Testa se o projeto possui uma estrutura com dados de carga
     @Test
     void estruturaPossuiDadosDeCarga() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados((banco, connection) -> {
@@ -26,7 +26,7 @@ public class DadosTest {
         });
     }
 
-    // 4 - Testa se o sistema rejeita um email que já está sendo utilizado
+    //5- Testa se o sistema rejeita um email que já está sendo utilizado
     @Test
     void rejeitaEmailDuplicado() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados((banco, connection) -> {
@@ -34,7 +34,7 @@ public class DadosTest {
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                 preparedStatement.setString(1, "Aluno teste");
-                preparedStatement.setString(2, "pedro.ascenco@gmail.com");
+                preparedStatement.setString(2, "aluno1@exemplo.com");
                 preparedStatement.setDate(3, Date.valueOf("2000-01-01"));
 
                 assertThrows(
@@ -46,7 +46,7 @@ public class DadosTest {
         });
     }
 
-    // 5 - Testa se o sistema rejeita um valor de plano inválido
+    //6- Testa se o sistema rejeita um valor de plano inválido
     @Test
     void rejeitaValorDePlanoInvalido() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados((banco, connection) -> {

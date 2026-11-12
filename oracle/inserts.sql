@@ -1,17 +1,17 @@
 INSERT INTO aluno(nome,email,data_nascimento,data_cadastro)
-    VALUES('Pedro Ascenço Bueno', 'pedro.ascenco@gmail.com',
+    VALUES('Pedro Ascenço Bueno', 'aluno1@exemplo.com',
     DATE '2006-05-15', ADD_MONTHS(TRUNC(SYSDATE), -14));
 
 INSERT INTO aluno(nome,email,data_nascimento,data_cadastro)
-    VALUES('Joaquim Attanasio da Silva', 'jattanasio57@gmail.com',
+    VALUES('Joaquim Attanasio da Silva', 'aluno2@exemplo.com',
     DATE '2006-06-16', ADD_MONTHS(TRUNC(SYSDATE), -3));
 
 INSERT INTO aluno(nome,email,data_nascimento,data_cadastro)
-    VALUES('Gabriel Gastal', 'gabrielgastal2017@gmail.com',
+    VALUES('Gabriel Gastal', 'aluno3@exemplo.com',
     DATE '2005-07-17', ADD_MONTHS(TRUNC(SYSDATE), -16));
 
 INSERT INTO aluno(nome,email,data_nascimento,data_cadastro)
-    VALUES('Fabrício Lopes', 'fabrilopes403@gmail.com',
+    VALUES('Fabrício Lopes', 'aluno4@exemplo.com',
     DATE '2007-08-18', ADD_MONTHS(TRUNC(SYSDATE), -2));
 
 INSERT INTO plano(nome,valor_mensal,duracao_meses)
