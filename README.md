@@ -43,42 +43,8 @@ As regras de negócio são implementadas com recursos próprios dos bancos, como
 ## 3. Estrutura original do projeto
 
 ```text
-InovaFit-master/
-├── .agents/
-├── docker/
-│   ├── oracle-init/
-│   │   └── oracle-init.sh
-│   └── postgres-init/
-│       └── postgres-init.sh
-├── java/
-│   └── InovaFit/
-│       └── src/main/java/com/example/
-│           ├── SQLExeception.java
-│           └── inovafit.java
-├── oracle/
-│   ├── consultas.sql
-│   ├── ddl.sql
-│   ├── indices.sql
-│   └── inserts.sql
-├── performance/
-│   ├── MedirPerformance.java
-│   ├── Motor.java
-│   ├── Oracle.java
-│   ├── Oracle_dados.sql
-│   ├── PostgreSQL.java
-│   └── Postgresql_dados.sql
-├── postgresql/
-│   ├── Consultas.sql
-│   ├── Ddl.sql
-│   ├── Indices.sql
-│   └── Inserts.sql
-├── procedures/
-│   ├── Oracle_procedures.sql
-│   └── Postgresql_procedures.sql
-├── AGENTS.md
-├── docker-compose.yml
-├── pom.xml
-└── README.md
+InovaFit/
+
 ```
 
 Os nomes e a capitalização acima representam os arquivos da versão original. Em ambientes Linux, letras maiúsculas e minúsculas fazem diferença nos caminhos dos arquivos.
