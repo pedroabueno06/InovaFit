@@ -12,8 +12,8 @@ import java.util.Scanner;
 //InovaFit - Sistema na linguagem de programação Java
 // que faz o uso de dois bancos de dados (PostgreSQL e Oracle).
 
-//Usuário consegue consultar os alunos que estão inscritos na acdemia com PreparedStatemente,
-// além de que o mesmo consegue consultar o status de pagamento de um aluno onde a procedure é 
+//Usuário consegue consultar os alunos que estão inscritos na acdemia com PreparedStatement,
+// além de que o mesmo consegue consultar o status de pagamento de um aluno onde a procedure é
 // chamada com CallableStatement.
 
 public class Inovafit {
