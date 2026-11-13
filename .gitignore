@@ -1,5 +1,4 @@
-
-# Java compilado
+# Java
 *.class
 
 # Maven
@@ -8,12 +7,12 @@ target/
 # Logs
 *.log
 
-# Arquivos temporários
+# Temporários
 *.tmp
 *.bak
 *.swp
 
-# Configurações locais de IDE
+# IDE
 .idea/
 .vscode/
 *.iml
@@ -23,8 +22,7 @@ target/
 Thumbs.db
 desktop.ini
 
-# Variáveis de ambiente e senhas locais
+# Variáveis de ambiente
 .env
 .env.*
 !.env.example
-
