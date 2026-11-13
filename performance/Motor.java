@@ -3,8 +3,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+
+// Nesta classe estão centralizadas a execução dos testes de desempenho.
+
 public abstract class Motor implements AutoCloseable {
-    
 //AutoCloseable é uma interface que define um objeto que possui a capacidade
 // de reter recursos, como conexões de banco de dados que necessitam ser fechados após serem utilizados.
 

@@ -1,5 +1,6 @@
 package com.example;
 
+// Classe auxiliar que cria um banco de dados de teste.
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;

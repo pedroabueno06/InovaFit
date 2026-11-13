@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 public class DadosTest {
 
-    //4- Testa se o projeto possui uma estrutura com dados de carga
+    //4- Testa se o projeto possui uma estrutura com dados de carga.
     @Test
     void estruturaPossuiDadosDeCarga() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados((banco, connection) -> {
@@ -26,7 +26,7 @@ public class DadosTest {
         });
     }
 
-    //5- Testa se o sistema rejeita um email que já está sendo utilizado
+    //5- Testa se o sistema rejeita um email que já está sendo utilizado.
     @Test
     void rejeitaEmailDuplicado() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados((banco, connection) -> {
@@ -46,7 +46,7 @@ public class DadosTest {
         });
     }
 
-    //6- Testa se o sistema rejeita um valor de plano inválido
+    //6- Testa se o sistema rejeita um valor de plano inválido.
     @Test
     void rejeitaValorDePlanoInvalido() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados((banco, connection) -> {
@@ -63,7 +63,7 @@ public class DadosTest {
         });
     }
 
-    // Realiza a conta dos registros de uma tabela
+    // Realiza a conta dos registros de uma tabela.
     private long contar(java.sql.Connection connection, String tabela) throws SQLException {
         String sql = "SELECT COUNT(*) FROM " + tabela;
 

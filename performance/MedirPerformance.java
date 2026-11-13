@@ -1,4 +1,4 @@
-// Realiza execução dos testes de desempenho do InovaFit nos dois bancos.
+// Realiza execução dos testes de performance do InovaFit nos dois bancos de dados.
 public class MedirPerformance {
     public static void main(String[] args) {
         System.out.println("=====================");
