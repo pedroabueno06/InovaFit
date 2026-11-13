@@ -1,6 +1,3 @@
--- ============================================================
--- performance/perf_postgresql_schema.sql
---
 -- Cria o schema isolado "performance" e as tabelas utilizadas
 -- pela massa de dados de desempenho do InovaFit.
 --
@@ -9,42 +6,6 @@
 --     dados principais (schema public);
 --   * Permitir medir planos "antes" e "depois" dos índices sem
 --     interferir nas tabelas, índices e dados principais;
---   * Espelhar a estrutura da DDL principal (postgresql/ddl.sql)
---     em produção, com EXCEÇÕES deliberadas e restritas a este
---     schema, detalhadas abaixo.
---
--- EXCEÇÕES AO ESPELHO DA DDL PRINCIPAL (somente schema performance):
---
---   1) A CONSTRAINT ÚNICA uk_pagamento_competencia(id_matricula,
---      competencia) foi OMITIDA (PAGAMENTO estava sem o UNIQUE).
---   2) O ÍNDICE ÚNICO PARCIAL uk_matricula_ativa_aluno(id_aluno)
---      WHERE status = 'ATIVA' foi OMITIDO.
---
---   Motivo único e exclusivo: essas duas restrições criariam
---   índices com id_matricula e id_aluno como coluna/prefixo líder,
---   tornando redundantes os índices de FK do experimento
---   (pagamento(id_matricula) e matricula(id_aluno)) e mascarando
---   o efeito real dos índices que se deseja demonstrar.
---
---   MANTIDOS INTACTOS: chaves primárias, FKs, índice único
---   aluno(email) e todas as demais estruturas. O SCHEMA PRINCIPAL
---   (public) NÃO é alterado em hipótese alguma.
---
---   Tabelas também omitidas por não serem necessárias às duas
---   consultas de desempenho: modalidade, auditoria_matricula,
---   frequencia.
---
--- Execução:
---   * Manual, como o usuário "inovafit" (dono do schema).
---   * NÃO deve ser registrado no docker-entrypoint-initdb.d.
---
--- Segurança:
---   * Este script NÃO remove nem altera objetos existentes.
---   * Apenas cria o schema e as tabelas perf.
---   * Para descartar a estrutura por completo (dados fictícios
---     somente), utilizar performance/perf_reset.sql, que também
---     só pode ser executado com autorização explícita.
--- ============================================================
 
 CREATE SCHEMA IF NOT EXISTS performance;
 

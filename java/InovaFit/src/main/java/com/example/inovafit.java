@@ -9,6 +9,13 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Scanner;
 
+//InovaFit - Sistema na linguagem de programação Java
+// que faz o uso de dois bancos de dados (PostgreSQL e Oracle).
+
+//Usuário consegue consultar os alunos que estão inscritos na acdemia com PreparedStatemente,
+// além de que o mesmo consegue consultar o status de pagamento de um aluno onde a procedure é 
+// chamada com CallableStatement.
+
 public class Inovafit {
     public static void main(String[] args) {
         String url;
@@ -190,8 +197,8 @@ public class Inovafit {
         } else if (url.startsWith("jdbc:oracle:")) {
             String sql = "{call registrar_pagamento(?, ?)}";
 
-            //Aqui é onde a procedure é chamada a partir de um parâmetro;
-            //Commit fica sob controle da aplicação.
+            //Procedure é chamada a partir de um parâmetro,
+            // além de que o commit fica sob controle da aplicação.
             try (CallableStatement callableStatement = connection.prepareCall(sql)) {
                 callableStatement.setLong(1, id);
                 callableStatement.registerOutParameter(2, Types.VARCHAR);

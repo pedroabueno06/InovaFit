@@ -5,7 +5,8 @@
 BEGIN;
 
 -- Realiza a remoção de uma carga anterior (pagamento), assim
--- é possível rodar o script mais de uma vez.DELETE FROM performance.pagamento.
+-- é possível rodar o script mais de uma vez.
+DELETE FROM performance.pagamento.
 DELETE FROM performance.matricula;
 DELETE FROM performance.aluno;
 

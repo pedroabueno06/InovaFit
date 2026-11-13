@@ -1,3 +1,4 @@
+#Roda uma única vez, na primeira vez em que o container subir.
 set -euo pipefail
 
 export NLS_LANG=.AL32UTF8

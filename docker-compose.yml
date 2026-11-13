@@ -1,3 +1,11 @@
+# InovaFit - Sistema com PostgreSQL 17, Oracle XE 21, testes e aplicações em Java
+#
+# docker-compose up -d --wait                       # Sobe os dois bancos de dados com todas as suas informações;
+# docker-compose run --rm testes                    # Realiza todos os testes em Java nos dois bancos de dados;
+# docker compose --profile apps run --rm app-java   # Inicializa a aplicação Java;
+# docker compose down -v                            # Apaga os dados do banco de dados, mas na próxima que o mesmo for subido, os scripts são recarregados.
+
+# As senhas que estão explicítas abaixo são apenas utilizadas em laboratório.
 services:
   postgres:
     image: postgres:17
