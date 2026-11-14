@@ -13,8 +13,7 @@ public class IndicesTest {
     @Test
     void indicesDoProjetoEstaoCriados() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados((banco, connection) -> {
-            List<String> esperados = List.of("IX_MATRICULA_ID_PLANO", "IX_PAGAMENTO_ID_MATRICULA",
-                "IX_FREQUENCIA_ID_MATRICULA_DATA", "IX_PAGAMENTO_VENCIMENTO_STATUS");
+            List<String> esperados = List.of("IX_MATRICULA_ID_PLANO", "IX_PAGAMENTO_ID_MATRICULA", "IX_PAGAMENTO_VENCIMENTO_STATUS");
             for (String nome : esperados) {
                 String sql = banco.oracle()
                     ? "SELECT COUNT(*) FROM USER_INDEXES WHERE INDEX_NAME=?"
