@@ -5,7 +5,7 @@
 # docker compose --profile apps run --rm app-java                                                                 # Inicializa a aplicação Java;
 # docker compose --profile apps run --rm app-java mvn clean compile exec:java -Dexec.mainClass=MedirPerformance   # Executa os testes de performance do InovaFit
 # docker compose --profile testes run --rm testes mvn test -Dtest=MutantesTest                                    # Realiza os testes de mutação;
-# docker compose down -v                                                                                          # Apaga os dados do banco de dados, mas na próxima que o mesmo for subido, os scripts são recarregados.
+# docker compose down -v                                                                                          # Apaga os dados do banco de dados, mas na próxima vez que o mesmo for subido, os scripts são recarregados.
 
 # As senhas que estão explicítas abaixo são apenas utilizadas em laboratório.
 services:
