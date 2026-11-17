@@ -23,7 +23,7 @@ public class Inovafit {
         String senha;
         String nomeBanco;
 
-        String pgUrl = env("PG_URL", "jdbc:postgresql://localhost:5432/inovafit");
+        String pgUrl = env("PG_URL", "jdbc:postgresql://localhost:5433/inovafit");
         String pgUser = env("PG_USER", "inovafit");
         String PgPassword = env("PG_PASSWORD", "inovafit_lab");
 

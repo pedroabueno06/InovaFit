@@ -12,7 +12,7 @@ public class BancoTest {
 
     public static List<Banco> bancos() {
         List<Banco> todos = List.of (
-        new Banco("PostgreSQL", env("PG_URL", "jdbc:postgresql://localhost:5432/inovafit"),
+        new Banco("PostgreSQL", env("PG_URL", "jdbc:postgresql://localhost:5433/inovafit"),
             env("PG_USER", "inovafit"), env("PG_PASSWORD", "inovafit_lab"), false),
         new Banco("Oracle", env("ORA_URL", "jdbc:oracle:thin:@//localhost:1521/XEPDB1"),
             env("ORA_USER", "inovafit"), env("ORA_PASSWORD_APP", "inovafit_lab"), true));
