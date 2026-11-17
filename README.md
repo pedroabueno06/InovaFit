@@ -1,180 +1,203 @@
 # InovaFit
 
-Sistema de banco de dados para gerenciamento de uma academia, desenvolvido como projeto acadêmico da disciplina de Banco de Dados.
+Sistema acadêmico de gerenciamento de academia, desenvolvido para demonstrar modelagem relacional, implementação de regras de negócio em bancos de dados e integração de uma aplicação Java com dois SGBDs: **PostgreSQL** e **Oracle**.
 
-O InovaFit tem como objetivo organizar informações de alunos, planos, matrículas, pagamentos, modalidades e frequências, aplicando regras de negócio diretamente no banco de dados.
+O projeto permite trabalhar com dados de alunos, planos, matrículas, modalidades, pagamentos e frequências. As regras de negócio são implementadas principalmente no banco de dados, por meio de constraints, procedures, triggers e índices.
 
-## 1. Objetivos do projeto
+## Sumário
 
-O sistema foi desenvolvido em **Java** e utiliza JDBC para acessar dois sistemas gerenciadores de banco de dados. O projeto **não foi desenvolvido em Python** e não possui uma aplicação Python como parte de sua implementação.
+- [Objetivos](#objetivos)
+- [Tecnologias](#tecnologias)
+- [Funcionalidades](#funcionalidades)
+- [Modelo de dados](#modelo-de-dados)
+- [Regras de negócio](#regras-de-negócio)
+- [Estrutura do projeto](#estrutura-do-projeto)
+- [Configuração do ambiente](#configuração-do-ambiente)
+- [Execução da aplicação Java](#execução-da-aplicação-java)
+- [Testes automatizados](#testes-automatizados)
+- [Testes de mutação](#testes-de-mutação)
+- [Análise de desempenho](#análise-de-desempenho)
+- [Observações técnicas](#observações-técnicas)
 
-O sistema trabalha com os seguintes bancos de dados:
+## Objetivos
 
-- PostgreSQL 17;
-- Oracle Database XE 21.
+O InovaFit tem como objetivos:
 
-A aplicação Java utiliza JDBC para se conectar aos bancos. O projeto também utiliza Maven para gerenciar as dependências e Docker Compose para configurar os ambientes.
+- Modelar um banco de dados relacional para o cenário de uma academia;
+- Implementar e validar regras de negócio diretamente no banco de dados;
+- Manter versões dos scripts SQL compatíveis com PostgreSQL e Oracle;
+- Integrar a aplicação Java aos dois bancos utilizando JDBC;
+- Desenvolver consultas SQL para extração e análise de informações;
+- Avaliar o uso de índices e o desempenho de consultas;
+- Verificar o comportamento do sistema por meio de testes automatizados e testes de mutação.
 
-O banco de dados contempla o gerenciamento de:
+## Tecnologias
 
-- alunos;
-- planos;
-- modalidades;
-- matrículas;
-- modalidades vinculadas às matrículas;
-- pagamentos;
-- frequências;
-- auditoria das alterações de matrícula.
-
-As regras de negócio são implementadas com recursos próprios dos bancos, como chaves primárias e estrangeiras, restrições (`CHECK` e `UNIQUE`), procedures, triggers, índices e transações.
-
-## 2. Tecnologias utilizadas
-
-| Tecnologia | Utilização |
+| Tecnologia | Aplicação no projeto |
 |---|---|
+| Java 21 | Aplicação e ferramentas de teste de desempenho |
+| JDBC | Comunicação entre Java e os bancos de dados |
+| Maven | Dependências, compilação e execução |
 | PostgreSQL 17 | Banco de dados relacional |
-| Oracle Database XE 21 | Segundo banco de dados relacional |
-| Java 21 | Linguagem da aplicação e acesso aos bancos |
-| JDBC | Conexão entre Java e os bancos |
-| Maven | Gerenciamento de dependências e execução Java |
-| Docker | Criação dos ambientes dos bancos |
-| Docker Compose | Orquestração dos serviços |
+| Oracle Database XE 21 | Banco de dados relacional |
+| Docker | Ambientes isolados dos bancos |
+| Docker Compose | Inicialização e integração dos serviços |
+| JUnit 5 | Testes automatizados |
 
-## 3. Estrutura original do projeto
+## Funcionalidades
 
-```text
-InovaFit/
+A aplicação Java disponibiliza um menu para selecionar o banco de dados que será utilizado: PostgreSQL ou Oracle. Após estabelecer a conexão, o usuário pode:
 
-```
+1. Consultar alunos com matrícula ativa, exibindo nome, plano, status e informação de bloqueio;
+2. Consultar o status de um pagamento informando seu identificador;
+3. Voltar ao menu de seleção do banco de dados;
+4. Encerrar a aplicação.
 
-Os nomes e a capitalização acima representam os arquivos da versão original. Em ambientes Linux, letras maiúsculas e minúsculas fazem diferença nos caminhos dos arquivos.
+A consulta de alunos utiliza `PreparedStatement`. A consulta do pagamento chama a procedure `registrar_pagamento`, utilizando os recursos JDBC apropriados para cada SGBD.
 
-## 4. Modelo de dados
+## Modelo de dados
 
-O banco possui as seguintes tabelas:
+Os scripts DDL definem as seguintes tabelas:
 
 | Tabela | Finalidade |
 |---|---|
-| `aluno` | Armazena os dados cadastrais dos alunos |
-| `plano` | Armazena os planos oferecidos pela academia |
-| `modalidade` | Registra as modalidades disponíveis |
-| `matricula` | Relaciona o aluno ao plano contratado |
-| `matricula_modalidade` | Relaciona matrículas às modalidades |
-| `pagamento` | Registra as mensalidades e seus pagamentos |
-| `frequencia` | Registra as entradas dos alunos na academia |
-| `auditoria_matricula` | Guarda alterações de status das matrículas |
+| `aluno` | Cadastro dos alunos |
+| `plano` | Planos oferecidos pela academia |
+| `modalidade` | Modalidades disponíveis |
+| `matricula` | Matrículas dos alunos nos planos |
+| `matricula_modalidade` | Associação entre matrículas e modalidades |
+| `pagamento` | Mensalidades e seus estados de pagamento |
+| `frequencia` | Registros de frequência dos alunos |
+| `auditoria_matricula` | Histórico de alterações de status das matrículas |
 
-O relacionamento entre as tabelas é garantido por chaves primárias e estrangeiras. Também existem restrições para validar informações como valores positivos, duração dos planos e estados permitidos para matrículas e pagamentos.
+As relações entre as entidades são definidas por chaves primárias e estrangeiras. Os scripts também utilizam restrições para validar os dados inseridos.
 
-**Observação sobre o escopo:** embora a proposta inicial mencione professores, turmas, inscrições e avaliações físicas, essas entidades não aparecem no DDL original analisado. Portanto, não são descritas aqui como funcionalidades já implementadas.
+O modelo visual disponibilizado no projeto está em `der/inova.png`.
 
-## 5. Regras de negócio e objetos do banco
+## Regras de negócio
+
+As regras estão distribuídas entre os scripts SQL de PostgreSQL e Oracle.
 
 ### Procedures
 
-Os arquivos `procedures/Postgresql_procedures.sql` e `procedures/Oracle_procedures.sql` contêm as procedures:
+O projeto implementa duas procedures em cada banco:
 
-- `registrar_pagamento`: recebe o identificador de um pagamento e verifica sua situação;
-- `cancelar_matricula`: altera o status da matrícula para cancelada, registra a data de encerramento e bloqueia a matrícula.
+- **`registrar_pagamento`**: recebe o identificador de um pagamento e retorna seu status. Caso o pagamento não exista, gera um erro de negócio.
+- **`cancelar_matricula`**: cancela uma matrícula ativa, registra a data de encerramento e bloqueia a matrícula. Caso não encontre uma matrícula ativa com o identificador informado, gera um erro.
 
 ### Triggers
 
-Os mesmos arquivos de procedures também definem triggers:
+- **`trg_validar_frequencia`**: valida as condições da matrícula antes de permitir a inclusão de uma frequência. A matrícula precisa estar ativa e desbloqueada; também é verificada a existência de pagamento não pago com vencimento superior a dez dias.
+- **`trg_auditar_matricula`**: registra na tabela `auditoria_matricula` as alterações realizadas no status de uma matrícula.
 
-- `trg_validar_frequencia`: impede o registro de frequência quando a matrícula não está ativa ou está bloqueada. No Oracle, também verifica pagamentos em atraso há mais de dez dias;
-- `trg_auditar_matricula`: registra alterações no status da matrícula na tabela `auditoria_matricula`.
+### Restrições e índices
 
-### Índices
+Os arquivos DDL definem a estrutura e as restrições das tabelas. Os arquivos de índices contêm índices criados para apoiar consultas e operações do banco.
 
-Os índices estão separados nos arquivos:
+Os scripts de cada SGBD são mantidos separadamente para respeitar as diferenças entre PostgreSQL e Oracle.
 
-- `postgresql/Indices.sql`;
-- `oracle/indices.sql`.
+## Consultas SQL
 
-Eles foram definidos para apoiar consultas e relacionamentos envolvendo matrículas, pagamentos e frequências.
+Cada banco possui um arquivo próprio de consultas:
 
-## 6. Consultas SQL
+- `postgresql/consultas.sql`
+- `oracle/consultas.sql`
 
-O projeto contém dez consultas SQL em cada banco.
+As consultas exploram operações como:
 
-No PostgreSQL, elas estão em `postgresql/Consultas.sql`. No Oracle, estão em `oracle/consultas.sql`.
+- Junções (`JOIN`);
+- Agrupamentos e filtros com `GROUP BY` e `HAVING`;
+- Funções de janela, como `RANK()` e `SUM() OVER`;
+- Subconsultas;
+- Consultas com `NOT EXISTS`;
+- Identificação de pagamentos atrasados;
+- Cálculo de valores recebidos por competência.
 
-As consultas trabalham com:
-
-1. JOIN entre alunos, matrículas e planos;
-2. JOIN entre alunos e modalidades;
-3. agregação e contagem de matrículas por plano;
-4. agregação com `HAVING`;
-5. função de janela `RANK()` para ranking de frequência;
-6. função de janela `SUM()` para acumulado de pagamentos;
-7. consulta anti-join com `NOT EXISTS`;
-8. subconsulta para pagamentos acima da média;
-9. identificação de mensalidades atrasadas há mais de dez dias;
-10. cálculo da receita recebida por competência.
-
-## 7. Aplicação Java
-
-A aplicação do projeto foi desenvolvida em Java. Não há módulo de aplicação em Python. A aplicação principal está localizada em:
+## Estrutura do projeto
 
 ```text
-java/InovaFit/src/main/java/com/example/inovafit.java
+InovaFit-master/
+├── der/
+│   └── inova.png
+├── docker/
+│   ├── dockerfile.testes
+│   ├── oracle-init/
+│   │   └── oracle-init.sh
+│   └── postgres-init/
+│       └── postgres-init.sh
+├── java/
+│   └── InovaFit/
+│       └── src/main/java/com/example/
+│           └── inovafit.java
+├── oracle/
+│   ├── consultas.sql
+│   ├── ddl.sql
+│   ├── indices.sql
+│   └── inserts.sql
+├── postgresql/
+│   ├── consultas.sql
+│   ├── ddl.sql
+│   ├── indices.sql
+│   └── inserts.sql
+├── procedures/
+│   ├── oracle_procedures.sql
+│   └── postgresql_procedures.sql
+├── performance/
+│   ├── MedirOracle.java
+│   ├── MedirPerformance.java
+│   ├── MedirPostgreSQL.java
+│   ├── Motor.java
+│   ├── Oracle.java
+│   ├── PostgreSQL.java
+│   ├── Oracle_dados.sql
+│   ├── Postgresql_dados.sql
+│   ├── perf_oracle.sql
+│   ├── perf_oracle_admin.sql
+│   ├── perf_oracle_indices.sql
+│   ├── perf_postgresql_indices.sql
+│   ├── perf_postgresql_schema.sql
+│   ├── perf_reset.sql
+│   └── explain_antes_depois.txt
+├── tests/
+│   ├── java/com/example/
+│   │   ├── BancoTest.java
+│   │   ├── ConsultasTest.java
+│   │   ├── DadosTest.java
+│   │   ├── DdlTest.java
+│   │   ├── IndicesTest.java
+│   │   ├── InovafitTest.java
+│   │   ├── ProceduresTest.java
+│   │   └── TriggerTest.java
+│   ├── java/mutacao/
+│   │   ├── ExecutarMutacoes.java
+│   │   ├── MutantesTest.java
+│   │   └── ResultadoMutacao.java
+│   └── resultados/
+│       └── resultado_mutacao.md
+├── docker-compose.yml
+├── pom.xml
+└── README.md
 ```
 
-O nome original da classe pública é `Inovafit`, dentro do pacote `com.example`.
-
-A aplicação apresenta um menu para escolher entre PostgreSQL e Oracle. Depois da conexão, permite:
-
-- consultar alunos com matrícula ativa e suas informações de plano;
-- informar o identificador de um pagamento para chamar a procedure `registrar_pagamento`;
-- retornar à seleção do banco ou encerrar o programa.
-
-As conexões utilizam variáveis de ambiente, com valores padrão destinados ao ambiente local de laboratório:
-
-| Variável | Valor padrão |
-|---|---|
-| `PG_URL` | `jdbc:postgresql://localhost:5432/inovafit` |
-| `PG_USER` | `inovafit` |
-| `PG_PASSWORD` | `inovafit_lab` |
-| `ORA_URL` | `jdbc:oracle:thin:@//localhost:1521/XEPDB1` |
-| `ORA_USER` | `inovafit` |
-| `ORA_PASSWORD_APP` | `inovafit_lab` |
-
-O arquivo `pom.xml` define Java 21 e as dependências JDBC do PostgreSQL e do Oracle.
-
-> **Atenção à compilação:** na versão original, o arquivo chama-se `inovafit.java`, mas a classe pública chama-se `Inovafit`. Em Java, o nome do arquivo de uma classe pública deve corresponder exatamente ao nome da classe. Esse ponto deve ser conferido caso a compilação apresente erro. Este README mantém os nomes originais, conforme solicitado.
-
-## 8. Análise de desempenho
-
-A pasta `performance/` contém os arquivos utilizados na preparação e execução da análise de desempenho:
-
-- `MedirPerformance.java`: classe principal que inicia os testes nos dois bancos;
-- `Motor.java`: classe de apoio para a execução dos testes;
-- `PostgreSQL.java`: implementação dos testes no PostgreSQL;
-- `Oracle.java`: implementação dos testes no Oracle;
-- `Postgresql_dados.sql`: script de carga de dados para PostgreSQL;
-- `Oracle_dados.sql`: script de carga de dados para Oracle.
-
-Os scripts de carga e as classes devem ser revisados e executados nos respectivos bancos antes de registrar resultados. Os tempos de execução e os ganhos de desempenho não devem ser informados sem medições reais.
-
-## 9. Como configurar o ambiente
+## Configuração do ambiente
 
 ### Pré-requisitos
 
-- Docker;
+- Docker instalado e em execução;
 - Docker Compose;
-- Java 21, para compilar e executar a aplicação;
-- Maven, para gerenciar dependências e compilar/executar a aplicação;
-- Cliente SQL, como DBeaver ou SQL Developer, opcional.
+- Java 21 e Maven, caso a aplicação seja executada fora do Docker.
 
-### Subir os bancos
+### Inicializar os bancos de dados
 
 Na pasta raiz do projeto, execute:
 
 ```bash
-docker compose up -d
+docker compose up -d --wait
 ```
 
-Verifique os serviços:
+O Compose configura os serviços PostgreSQL e Oracle, com volumes persistentes e scripts de inicialização.
+
+Para verificar os serviços:
 
 ```bash
 docker compose ps
@@ -187,71 +210,145 @@ docker compose logs -f postgres
 docker compose logs -f oracle
 ```
 
-### Acessar os bancos
+### Dados de conexão
 
 **PostgreSQL**
 
-- Host: `localhost`
-- Porta: `5432`
-- Banco: `inovafit`
-- Usuário: `inovafit`
-- Senha: `inovafit_lab`
+| Configuração | Valor |
+|---|---|
+| Host | `localhost` |
+| Porta publicada | `5433` |
+| Banco | `inovafit` |
+| Usuário | `inovafit` |
+| Senha de laboratório | `inovafit_lab` |
 
 **Oracle**
 
-- Host: `localhost`
-- Porta: `1521`
-- Serviço: `XEPDB1`
-- Usuário da aplicação: `inovafit`
-- Senha da aplicação: `inovafit_lab`
+| Configuração | Valor |
+|---|---|
+| Host | `localhost` |
+| Porta | `1521` |
+| Serviço | `XEPDB1` |
+| Usuário da aplicação | `inovafit` |
+| Senha de laboratório | `inovafit_lab` |
 
-As credenciais são destinadas ao ambiente acadêmico local. Não devem ser reutilizadas em produção.
+As portas internas dos containers são diferentes das portas publicadas no computador. Por isso, a aplicação executada diretamente no computador utiliza `localhost:5433` para PostgreSQL. Os serviços executados dentro da rede do Docker utilizam `postgres:5432`.
 
-### Executar a aplicação Java
+> As credenciais apresentadas são destinadas ao ambiente acadêmico local. Não utilize essas configurações em produção.
 
-Na raiz do projeto, com os bancos disponíveis e Maven instalado:
+## Execução da aplicação Java
+
+Com Java 21 e Maven instalados, e os bancos já inicializados, execute na raiz do projeto:
 
 ```bash
 mvn compile
 mvn exec:java
 ```
 
-A classe principal configurada no `pom.xml` é `com.example.Inovafit`.
+Também é possível iniciar a aplicação pelo serviço configurado no perfil `apps`:
 
-### Encerrar os serviços
+```bash
+docker compose --profile apps run --rm app-java
+```
+
+A aplicação utiliza as seguintes variáveis de ambiente, quando definidas:
+
+| Variável | Finalidade |
+|---|---|
+| `PG_URL` | URL JDBC do PostgreSQL |
+| `PG_USER` | Usuário do PostgreSQL |
+| `PG_PASSWORD` | Senha do PostgreSQL |
+| `ORA_URL` | URL JDBC do Oracle |
+| `ORA_USER` | Usuário do Oracle |
+| `ORA_PASSWORD_APP` | Senha do Oracle |
+
+Quando as variáveis não são definidas, o código utiliza valores padrão para o ambiente local.
+
+## Testes automatizados
+
+Os testes automatizados estão em `tests/java/` e utilizam JUnit 5. Eles verificam aspectos como:
+
+- Conexão com os bancos;
+- Estrutura das tabelas;
+- Dados inseridos;
+- Consultas SQL;
+- Índices;
+- Procedures;
+- Triggers;
+- Integração da aplicação.
+
+Para executar os testes pelo serviço Docker configurado no projeto:
+
+```bash
+docker compose run --rm testes
+```
+
+A execução depende de os serviços PostgreSQL e Oracle estarem disponíveis e saudáveis.
+
+## Testes de mutação
+
+O projeto inclui uma implementação própria de testes de mutação em `tests/java/mutacao/`. O objetivo é verificar se os testes automatizados conseguem identificar alterações indevidas nas regras de negócio.
+
+Os cenários registrados incluem alterações na validação de matrícula, no limite de atraso, na restrição de matrícula ativa, na validação de valor mensal e na geração de auditoria.
+
+Para executar o programa de mutação com Maven:
+
+```bash
+mvn exec:java -Dexec.mainClass=mutacao.ExecutarMutacoes -Dexec.classpathScope=test
+```
+
+O relatório versionado está em:
+
+```text
+tests/resultados/resultado_mutacao.md
+```
+
+Consulte esse arquivo para verificar os resultados registrados. A execução de testes de mutação não substitui a validação funcional do sistema.
+
+## Análise de desempenho
+
+A pasta `performance/` contém classes Java e scripts SQL utilizados para preparar dados, executar consultas e comparar planos de execução antes e depois da criação de índices.
+
+Arquivos principais:
+
+- `MedirPerformance.java`: ponto de entrada da medição;
+- `Motor.java`: estrutura de apoio à execução;
+- `PostgreSQL.java` e `Oracle.java`: rotinas específicas de cada banco;
+- `Postgresql_dados.sql` e `Oracle_dados.sql`: preparação da massa de dados;
+- `explain_antes_depois.txt`: registro de planos e medições.
+
+O arquivo `explain_antes_depois.txt` contém resultados registrados para consultas no PostgreSQL e no Oracle. Os dados devem ser interpretados considerando que o plano, o volume de dados e as condições de execução influenciam os tempos medidos. Não se deve generalizar os resultados para outros ambientes sem repetir os testes.
+
+Para iniciar a execução de desempenho pelo serviço configurado no Compose, o próprio arquivo `docker-compose.yml` documenta o seguinte comando:
+
+```bash
+docker compose --profile apps run --rm app-java mvn clean compile exec:java -Dexec.mainClass=MedirPerformance
+```
+
+## Encerrar os bancos
+
+Para parar e remover os containers, preservando os volumes:
 
 ```bash
 docker compose down
 ```
 
-Para remover também os volumes e os dados persistidos dos bancos:
+Para remover também os volumes e os dados persistidos:
 
 ```bash
 docker compose down -v
 ```
 
-> O comando `down -v` apaga os dados armazenados nos volumes. Utilize-o somente se desejar reiniciar os bancos do zero.
+> **Atenção:** `docker compose down -v` apaga os dados armazenados nos volumes dos bancos. Utilize somente se desejar excluir os dados e reinicializar o ambiente.
 
-## 10. Pontos que precisam de atenção
+## Observações técnicas
 
-Esta documentação preserva a estrutura original e não significa que todos os itens abaixo já estejam funcionando. Na revisão dos arquivos originais, foram identificados pontos que precisam ser verificados:
+- O projeto contém scripts SQL separados para PostgreSQL e Oracle. Não execute o script de um banco no outro sem adaptar e validar a sintaxe.
+- O arquivo Java presente no ZIP está nomeado `inovafit.java`, enquanto a classe pública declarada nele é `Inovafit`. Em Java, o nome do arquivo de uma classe pública deve corresponder ao nome da classe, inclusive quanto a maiúsculas e minúsculas. Esse ponto precisa ser corrigido ou validado para que a compilação funcione de forma consistente.
+- O `pom.xml` configura `com.example.Inovafit` como classe principal.
+- A documentação descreve os arquivos e recursos encontrados no projeto. A presença de um teste ou script não significa, por si só, que ele foi executado com sucesso no ambiente atual.
+- O escopo documentado neste README se limita às tabelas, procedimentos, triggers e funcionalidades identificados nos arquivos do projeto.
 
-- O serviço `testes` do `docker-compose.yml` referencia uma pasta `tests/`, que não aparece na estrutura original do ZIP.
-- O script de inicialização do Oracle utiliza caminhos com nomes como `Ddl.sql` e `Inserts.sql`, enquanto os arquivos originais estão nomeados `ddl.sql` e `inserts.sql`. Em sistemas sensíveis a maiúsculas e minúsculas, isso pode impedir a inicialização.
-- A procedure original `registrar_pagamento` verifica o status e gera erros para pagamentos pendentes ou atrasados, mas não executa a atualização do pagamento para `PAGO`.
-- Os scripts originais de carga de dados em `performance/` apresentam inconsistências de nomes de tabelas, colunas e comandos SQL e precisam ser corrigidos antes de uma medição confiável.
-- A classe `Inovafit` e o arquivo `inovafit.java` possuem capitalização diferente, o que pode causar erro de compilação.
-- Não foram encontrados no DDL original as tabelas de professores, turmas, inscrições e avaliações físicas mencionadas na descrição inicial.
-- É necessário executar os scripts nos dois bancos e registrar evidências dos resultados para confirmar a compatibilidade.
+## Finalidade acadêmica
 
-## 11. Considerações finais
-
-O InovaFit demonstra o uso de recursos de banco de dados em um cenário de gerenciamento de academia, incluindo modelagem relacional, consultas SQL, procedures, triggers, índices e integração com Java por JDBC.
-
-A existência de scripts separados para PostgreSQL e Oracle permite comparar as particularidades de cada SGBD e observar como regras de negócio podem ser implementadas diretamente no banco de dados.
-
-O projeto deve ser considerado concluído após a revisão dos pontos pendentes, execução dos scripts nos dois bancos e validação da aplicação.
-
-## Licença
-
-Projeto desenvolvido para fins acadêmicos.
+Projeto desenvolvido para fins acadêmicos, com foco em banco de dados relacionais, SQL, integração Java/JDBC, testes e análise de desempenho.
