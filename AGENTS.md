@@ -51,7 +51,7 @@ O objetivo é implementar regras de negócio diretamente nos bancos de dados, ut
 8. Utilizar a sintaxe específica de cada SGBD;
 9. Não considerar um script correto sem verificar sua execução;
 10. Escrever comentários claros nos scripts SQL;
-11. Não remover testes ou funcionanlidades existentes no projeto sem a devida autorização;
+11. Não remover testes ou funcionalidades existentes no projeto sem a devida autorização;
 12. Não alterar configurações de conexão ou portas sem verificar como a aplicação está sendo executada.
 
 ## 5. Cuidados com os bancos de dados
@@ -250,4 +250,4 @@ Sempre:
 - Não inventar resultados de testes;
 - Não afirmar que executou comandos sem realmente executá-los;
 - Solicitar autorização antes de operações potencialmente destrutivas;
-- Não criar, excluir ou modficar arquivos e bancos de dados sem autorização do usuário.
+- Não criar, excluir ou modificar arquivos e bancos de dados sem autorização do usuário.
