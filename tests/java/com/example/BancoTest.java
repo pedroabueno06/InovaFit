@@ -38,7 +38,7 @@ public class BancoTest {
         return connection;
     }
 
-     @FunctionalInterface
+    @FunctionalInterface
     public interface Verificacao {
         void executar(Banco banco, Connection connection) throws Exception;
     }
