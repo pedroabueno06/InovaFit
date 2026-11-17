@@ -189,7 +189,7 @@ Regras:
 
 Comando para executar os testes:
 
-docker-compose run --rm testes
+- docker-compose run --rm testes
 
 ## 10 Testes de mutação
 
@@ -227,7 +227,7 @@ Regras:
 
 Comando para executar todos os testes de mutação:
 
-mvn exec:java -Dexec.mainClass=mutacao.ExecutarMutacoes -Dexec.classpathScope=test
+- mvn exec:java -Dexec.mainClass=mutacao.ExecutarMutacoes -Dexec.classpathScope=test
 
 ## 11. Skills disponíveis
 
