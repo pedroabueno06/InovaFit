@@ -234,7 +234,7 @@ docker compose logs -f oracle
 
 As portas internas dos containers são diferentes das portas publicadas no computador. Por isso, a aplicação executada diretamente no computador utiliza `localhost:5433` para PostgreSQL. Os serviços executados dentro da rede do Docker utilizam `postgres:5432`.
 
-> As credenciais apresentadas são destinadas ao ambiente acadêmico local. Não utilize essas configurações em produção.
+As credenciais apresentadas são destinadas ao ambiente acadêmico local. Não utilize essas configurações em produção.
 
 ## Execução da aplicação Java
 
@@ -339,7 +339,7 @@ Para remover também os volumes e os dados persistidos:
 docker compose down -v
 ```
 
-> **Atenção:** `docker compose down -v` apaga os dados armazenados nos volumes dos bancos. Utilize somente se desejar excluir os dados e reinicializar o ambiente.
+**Atenção:** `docker compose down -v` apaga os dados armazenados nos volumes dos bancos. Utilize somente se desejar excluir os dados e reinicializar o ambiente.
 
 ## Observações técnicas
 
