@@ -11,11 +11,20 @@ public class BancoTest {
 
 
     public static List<Banco> bancos() {
-        return List.of (
+        List<Banco> todos = List.of (
         new Banco("PostgreSQL", env("PG_URL", "jdbc:postgresql://localhost:5432/inovafit"),
             env("PG_USER", "inovafit"), env("PG_PASSWORD", "inovafit_lab"), false),
         new Banco("Oracle", env("ORA_URL", "jdbc:oracle:thin:@//localhost:1521/XEPDB1"),
             env("ORA_USER", "inovafit"), env("ORA_PASSWORD_APP", "inovafit_lab"), true));
+
+            String bancoMutacao = System.getenv("MUTACAO_BANCO");
+                if(bancoMutacao == null || bancoMutacao.isBlank()) {
+                    return todos;
+                }
+
+                return todos.stream()
+                    .filter(banco -> banco.nome().equalsIgnoreCase(bancoMutacao))
+                    .toList();
     }
 
     private static String env(String chave, String padrao) {
