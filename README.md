@@ -339,16 +339,28 @@ Para remover também os volumes e os dados persistidos:
 docker compose down -v
 ```
 
-**Atenção:** `docker compose down -v` apaga os dados armazenados nos volumes dos bancos. Utilize somente se desejar excluir os dados e reinicializar o ambiente.
+> O comando `down -v` apaga os dados armazenados nos volumes. Utilize-o somente se desejar reiniciar os bancos do zero.
 
-## Observações técnicas
+## 10. Pontos que precisam de atenção
 
-- O projeto contém scripts SQL separados para PostgreSQL e Oracle. Não execute o script de um banco no outro sem adaptar e validar a sintaxe.
-- O arquivo Java presente no ZIP está nomeado `inovafit.java`, enquanto a classe pública declarada nele é `Inovafit`. Em Java, o nome do arquivo de uma classe pública deve corresponder ao nome da classe, inclusive quanto a maiúsculas e minúsculas. Esse ponto precisa ser corrigido ou validado para que a compilação funcione de forma consistente.
-- O `pom.xml` configura `com.example.Inovafit` como classe principal.
-- A documentação descreve os arquivos e recursos encontrados no projeto. A presença de um teste ou script não significa, por si só, que ele foi executado com sucesso no ambiente atual.
-- O escopo documentado neste README se limita às tabelas, procedimentos, triggers e funcionalidades identificados nos arquivos do projeto.
+Esta documentação preserva a estrutura original e não significa que todos os itens abaixo já estejam funcionando. Na revisão dos arquivos originais, foram identificados pontos que precisam ser verificados:
 
-## Finalidade acadêmica
+- O serviço `testes` do `docker-compose.yml` referencia uma pasta `tests/`, que não aparece na estrutura original do ZIP.
+- O script de inicialização do Oracle utiliza caminhos com nomes como `Ddl.sql` e `Inserts.sql`, enquanto os arquivos originais estão nomeados `ddl.sql` e `inserts.sql`. Em sistemas sensíveis a maiúsculas e minúsculas, isso pode impedir a inicialização.
+- A procedure original `registrar_pagamento` verifica o status e gera erros para pagamentos pendentes ou atrasados, mas não executa a atualização do pagamento para `PAGO`.
+- Os scripts originais de carga de dados em `performance/` apresentam inconsistências de nomes de tabelas, colunas e comandos SQL e precisam ser corrigidos antes de uma medição confiável.
+- A classe `Inovafit` e o arquivo `inovafit.java` possuem capitalização diferente, o que pode causar erro de compilação.
+- Não foram encontrados no DDL original as tabelas de professores, turmas, inscrições e avaliações físicas mencionadas na descrição inicial.
+- É necessário executar os scripts nos dois bancos e registrar evidências dos resultados para confirmar a compatibilidade.
 
-Projeto desenvolvido para fins acadêmicos, com foco em banco de dados relacionais, SQL, integração Java/JDBC, testes e análise de desempenho.
+## 11. Considerações finais
+
+O InovaFit demonstra o uso de recursos de banco de dados em um cenário de gerenciamento de academia, incluindo modelagem relacional, consultas SQL, procedures, triggers, índices e integração com Java por JDBC.
+
+A existência de scripts separados para PostgreSQL e Oracle permite comparar as particularidades de cada SGBD e observar como regras de negócio podem ser implementadas diretamente no banco de dados.
+
+O projeto deve ser considerado concluído após a revisão dos pontos pendentes, execução dos scripts nos dois bancos e validação da aplicação.
+
+## Licença
+
+Projeto desenvolvido para fins acadêmicos.
