@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 public class TriggerTest {
     
-    //17- Testa se o trigger permite emitir frequência para uma matrícula ativa
+    //Test017- Testa se o trigger permite emitir frequência para uma matrícula ativa
     @Test
     void triggerPermiteFrequenciaParaMatriculaAtiva() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados((banco, connection) -> {
@@ -19,7 +19,7 @@ public class TriggerTest {
         });
     }
 
-    //18-Testa se o trigger permite emitir frequência para uma matrícula cancelada
+    //Test018-Testa se o trigger permite emitir frequência para uma matrícula cancelada
     @Test
     void triggerRejeitaFrequenciaParaMatriculaCancelada() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados((banco, connection) -> {
@@ -29,7 +29,7 @@ public class TriggerTest {
         });
     }
 
-    //19- Testa se o trigger do banco de dados Oracle rejeita uma matrícula com um atraso superior de dez dias
+    //Test019- Testa se o trigger do banco de dados Oracle rejeita uma matrícula com um atraso superior de dez dias
     @Test
     void triggerRejeitaMatriculaComAtrasoSuperiorADezDias() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados((banco, connection) -> {

@@ -49,7 +49,7 @@ public class ConsultasTest {
         return consultas;
     }
 
-    //1- Testa as consultas do projeto em ambos os bancos de dados
+    //Test001- Testa as consultas do projeto em ambos os bancos de dados
     @Test
     void consultasDoProjetoRodamNosDoisBancosDeDados() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados(((banco, connection) -> {
@@ -66,7 +66,7 @@ public class ConsultasTest {
         }));
     }
 
-    //2- Testa se as consultas existem nos bancos de dados
+    //Test002- Testa se as consultas existem nos bancos de dados
     @Test
     void consultasExistem() throws Exception {
         for (BancoTest.Banco banco : BancoTest.bancos()) {
@@ -76,7 +76,7 @@ public class ConsultasTest {
         }
     }
 
-    //3- Testa de todas as dez consultas correspondem ao valores esperados
+    //Test003- Testa de todas as dez consultas correspondem ao valores esperados
     @Test
     void resultadosDasConsultasEstaoCorretos() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados(((banco, connection) -> {

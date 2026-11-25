@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 public class ProceduresTest {
     
-    //13- Testa se a procedure retorna o status dos pagamentos
+    //Test013- Testa se a procedure retorna o status dos pagamentos
     @Test
     void proceduresRetornaStatusDosPagamentos() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados((banco, connection) -> {
@@ -46,7 +46,7 @@ public class ProceduresTest {
         }
     }
 
-    //14- Testa se a procedure retorna erro de negócio em pagamento inexistente
+    //Test014- Testa se a procedure retorna erro de negócio em pagamento inexistente
     @Test
     void proceduresRetornaErroDeNegocioEmPagamentoInexistente() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados((banco, connection) -> {
@@ -67,7 +67,7 @@ public class ProceduresTest {
         });
     }
 
-    //15- Testa se a auditoria de dados funciona ao cancelar a matrícula, assim atualizando os dados
+    //Test015- Testa se a auditoria de dados funciona ao cancelar a matrícula, assim atualizando os dados
     @Test
     void cancelarMatriculaAtualizaDadosEGeraAuditoria() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados((banco, connection) -> {
@@ -92,7 +92,7 @@ public class ProceduresTest {
         });
     }
 
-    //16- Testa se ao tentar cancelar uma matrícula inativa é retornada uma mensagem de erro
+    //Test016- Testa se ao tentar cancelar uma matrícula inativa é retornada uma mensagem de erro
     @Test
     void cancelarMatriculaInativaRetornaErro() throws Exception {
         BancoTest.testarEmAmbosOsBancosDeDados((banco, connection) -> {
