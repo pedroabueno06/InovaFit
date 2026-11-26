@@ -8,6 +8,8 @@
 # docker compose down -v                                                                                          # Apaga os dados do banco de dados, mas na próxima vez que o mesmo for subido, os scripts são recarregados.
 
 # As senhas que estão explícitas abaixo são apenas utilizadas em laboratório.
+
+name: inovafit
 services:
 
 ## Banco de dados PostgreSQL
